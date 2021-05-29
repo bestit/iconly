@@ -1,15 +1,16 @@
-import { Library } from './classes/library';
-import { createCustomElement } from './classes/custom-element';
-import { Config } from './interfaces';
+import { LibraryConfig } from './classes/library';
+import { CustomElement } from './classes/custom-element';
+import { LibraryService } from './service/library-service';
 
-const library = new Library();
+export function createLibrary(library: LibraryConfig) {
+    LibraryService.getInstance().merge(library);
+};
 
-export class SvgIconSystem {
-    config: Config;
+export function createElement(name: string) {     
+    CustomElementRegistry 
+    window.customElements.define(name, class extends CustomElement {});
+};
 
-    constructor(options: Config) {
-        this.config = options;
-        library.merge(this.config.library);
-        createCustomElement(this.config.name, library);
-    }
-}
+export function getUrlEncodedIcon(symbol, pack, color, rotaion) {
+    // TODO: load icon url encoded, replace currentColor with param color
+};

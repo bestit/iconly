@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Icon Element</title>
+  <style type="text/css">
+    img,
+    test-icon {
+      display: block;
+      height: 24px;
+      width: 24px;
+    }
+  </style>
+</head>
+<body>
+  <img src="/public/icons/check-solid.svg" alt="">
+  <test-icon symbol="check"></test-icon>
+  <test-icon symbol="atom"></test-icon>
+  <test-icon symbol="atom43645"></test-icon>
+  <script src="../_bundles/icon-element.js"></script>
+  <script type="text/javascript">
+    IconElement.createLibrary({
+      default: {
+          check: '/public/icons/check-solid.svg',
+          atom: '/public/icons/atom-solid.svg',
+          atom43645: '43534',
+        }
+    })
+    IconElement.createElement('test-icon');
+  </script>
+</body>
+</html>

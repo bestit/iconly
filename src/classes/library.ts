@@ -1,54 +1,63 @@
-export class Library {
-    library: any = {};
+export const LIBRARY_DEFAULT_PACK = 'default';
 
-    constructor(library: any = {}) {
+export interface LibraryConfig {
+    [LIBRARY_DEFAULT_PACK]?: object,
+}
+
+export class Library {
+    library: LibraryConfig;
+
+    constructor(library: LibraryConfig = { default: {} }) {
         this.library = library;
     }
 
-    async get(symbol: string): Promise<string|null> {
-        const entry = this.library[symbol];
+    async get(symbol: string|null, pack:string|null): Promise<string|null> {
+        if (symbol === null) {
+            return null;
+        }
 
-        if (entry?.type === 'internal') {
-            return entry.source;
-        } else if (entry?.type === 'id') {
-            return Library.getSvgDef(entry.source);
-        } else if (entry?.type === 'url') {
+        if (pack === null) {
+            pack = LIBRARY_DEFAULT_PACK;
+        }
+
+        const source = this.library[pack][symbol];
+
+        if (typeof source === 'string') {
             // eslint-disable-next-line no-return-await
-            return await Library.getSvgUrl(entry.source).then(data => data);
+            return await Library.getSvgUrl(source).then(data => data);
         }
 
         return null;
     }
 
-    add(symbol: string, source: string) {
-        this.library[symbol] = source;
+    add(symbol: string, source: string, pack: string = LIBRARY_DEFAULT_PACK): this {
+        this.library[pack][symbol] = source;
+        return this;
     }
 
-    merge(symbols: any) {
+    remove(symbol: string, pack: string = LIBRARY_DEFAULT_PACK): this {
+        delete this.library[pack][symbol];
+        return this;
+    }
+
+    merge(library: LibraryConfig) {
         this.library = {
             ...this.library,
-            ...symbols
+            ...library
         };
     }
 
-    static getSvgDef(id: string) {
-        const svgDef = document.getElementById(id).innerHTML;
-        const inlineSvg = document.createElement('svg');
-        inlineSvg.setAttribute('version', '1.1');
-        inlineSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        inlineSvg.setAttribute('width', '16');
-        inlineSvg.setAttribute('height', '16');
-        inlineSvg.setAttribute('viewBox', '0 0 16 16');
-        inlineSvg.innerHTML = svgDef;
-
-        return inlineSvg.outerHTML;
-    }
-
-    static async getSvgUrl(url: string) {
+    static async getSvgUrl(url: string): Promise<string> {
         const response = await fetch(url);
+
+        if (!response.ok) {
+            return '';
+        }
+
         const data = await response.text();
         const temp = document.createElement('div');
         temp.innerHTML = data;
+
         return temp.querySelector('svg').outerHTML;
     }
 }
