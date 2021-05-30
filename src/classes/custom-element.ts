@@ -1,12 +1,17 @@
-import { LIBRARY_DEFAULT_NAMESPACE } from './library';
-import { LIBRARY_DEFAULT_PACK } from './library';
-import { LibraryService } from '../service/library-service';
+import { LIBRARY_DEFAULT_NAMESPACE, LIBRARY_DEFAULT_PACK } from './library';
+import { IconHandlerService } from '../service/icon-handler-service';
+
+export interface ElementAttributesInterface {
+    symbol?: string|null,
+    pack?: string|null,
+    namespace?: string|null,
+}
 
 export class CustomElement extends HTMLElement {
     static get observedAttributes() {
-        return ['symbol', 'pack'];
+        return ['symbol', 'pack', 'namespace'];
     }
-    
+
     private namespace: string|null = null;
     private pack: string|null = null;
     private symbol: string|null = null;
@@ -18,7 +23,7 @@ export class CustomElement extends HTMLElement {
         this.pack = this.getAttributeValue('pack', LIBRARY_DEFAULT_PACK);
         this.symbol = this.getAttribute('symbol');
 
-        this.getIcon(this.symbol, this.pack, this.namespace);
+        this.getIcon();
     }
 
     attributeChangedCallback() {
@@ -31,7 +36,7 @@ export class CustomElement extends HTMLElement {
         let namespaceChanged = false;
 
         const namespace = this.getAttributeValue('namespace', LIBRARY_DEFAULT_NAMESPACE);
-        const pack = this.getAttributeValue('namespace', LIBRARY_DEFAULT_PACK);
+        const pack = this.getAttributeValue('pack', LIBRARY_DEFAULT_PACK);
         const symbol = this.getAttribute('symbol');
 
         if (this.namespace !== namespace) {
@@ -50,7 +55,7 @@ export class CustomElement extends HTMLElement {
         }
 
         if (symbolChanged || packChanged || namespaceChanged) {
-            this.getIcon(this.symbol, this.pack, this.namespace);
+            this.getIcon();
         }
     }
 
@@ -58,22 +63,23 @@ export class CustomElement extends HTMLElement {
         let attributeValue = this.getAttribute(name);
 
         if (attributeValue === null) {
-            attributeValue = fallback
+            attributeValue = fallback;
         }
 
         return attributeValue;
     }
 
-    getIcon(symbol: string, pack: string, namespace: string) {
-        LibraryService.getInstance()
-            .get(
-                symbol,
-                pack,
-                namespace
-            ).then(data => {
+    getIcon() {
+        IconHandlerService
+            .getIcon({
+                symbol: this.symbol,
+                pack: this.pack,
+                namespace: this.namespace
+            })
+            .then(data => {
                 this.innerHTML = data;
             }).catch(() => {
                 this.innerHTML = '';
             });
     }
-};
+}

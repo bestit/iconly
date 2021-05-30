@@ -19,23 +19,17 @@
   <img src="/public/icons/storefront/default/check.svg" alt="">
   <test-icon symbol="atom"></test-icon>
   <test-icon symbol="check"></test-icon>
+  <test-icon symbol="cat" namespace="theme"></test-icon>
   <test-icon>
     <button type="button">Button</button>
   </test-icon>
   <script src="../_bundles/icon-element.js"></script>
   <script type="text/javascript">
-    // IconElement.IconElementService.setLibrary({
-    //   fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
-    // })
-    IconElement.IconElementService.setLibrary({
-      storefront: {
-        default: {
-          atom: '/public/icons/storefront/default/atom.svg',
-          check: '/public/icons/storefront/default/check.svg',
-        }
-      }
+    IconElement.IconService.config({
+      fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
+
     });
-    IconElement.IconElementService.createElement('test-icon');
+    IconElement.IconService.createElement('test-icon');
   </script>
 </body>
 </html>

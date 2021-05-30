@@ -1,10 +1,9 @@
-import { LibraryInterface } from '../service/library-service';
+import { ElementAttributesInterface } from './custom-element';
 
 export const LIBRARY_DEFAULT_NAMESPACE: string = 'storefront';
 export const LIBRARY_DEFAULT_PACK: string = 'default';
-export const LIBRARY_DEFAULT_ICON: string = '';
 
-export interface LibraryConfig {
+export interface LibraryInterface {
     [index: string]: {
         [index: string]: {
             [index: string]: string
@@ -15,69 +14,40 @@ export interface LibraryConfig {
     }
 }
 
-const defaultLibrary: LibraryConfig = {
+const defaultLibrary: LibraryInterface = {
     storefront: {
         default: {}
     }
 };
 
-export class Library implements LibraryInterface {
-    private library: LibraryConfig;
+export class Library {
+    private library: LibraryInterface;
 
-    constructor(library: LibraryConfig = defaultLibrary) {
+    constructor(library: LibraryInterface = defaultLibrary) {
         this.library = library;
     }
 
-    public async get(
-        symbol: string|null,
-        pack: string = LIBRARY_DEFAULT_PACK,
-        namespace: string = LIBRARY_DEFAULT_NAMESPACE
-    ): Promise<string|null> {
-        const source = this.library[namespace][pack][symbol];
-
-        if (typeof source === 'string') {
-            // eslint-disable-next-line no-return-await
-            return await Library.getSvgUrl(source).then(data => data);
-        }
-
-        return null;
+    public getLibrary(): LibraryInterface {
+        return this.library;
     }
 
     public add(
-        symbol: string,
+        attributes: ElementAttributesInterface,
         source: string,
-        pack: string = LIBRARY_DEFAULT_PACK,
-        namespace: string = LIBRARY_DEFAULT_NAMESPACE
     ): this {
-        this.library[namespace][pack][symbol] = source;
+        this.library[attributes.namespace][attributes.pack][attributes.symbol] = source;
         return this;
     }
 
-    public remove(
-        symbol: string,
-        pack: string = LIBRARY_DEFAULT_PACK,
-        namespace: string = LIBRARY_DEFAULT_NAMESPACE
-    ): this {
-        delete this.library[namespace][pack][symbol];
+    public remove(attributes: ElementAttributesInterface): this {
+        delete this.library[attributes.namespace][attributes.pack][attributes.symbol];
         return this;
     }
 
-    public merge(library: LibraryConfig) {
+    public merge(library: LibraryInterface) {
         this.library = {
             ...this.library,
             ...library
         };
-    }
-
-    static async getSvgUrl(url: string): Promise<string> {
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            return '';
-        }
-
-        const data = await response.text();
-       
-        return data;
     }
 }
