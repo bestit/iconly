@@ -1,26 +1,39 @@
-export const LIBRARY_DEFAULT_PACK = 'default';
+import { LibraryInterface } from '../service/library-service';
+
+export const LIBRARY_DEFAULT_NAMESPACE: string = 'storefront';
+export const LIBRARY_DEFAULT_PACK: string = 'default';
+export const LIBRARY_DEFAULT_ICON: string = '';
 
 export interface LibraryConfig {
-    [LIBRARY_DEFAULT_PACK]?: object,
+    [index: string]: {
+        [index: string]: {
+            [index: string]: string
+        }
+    };
+    storefront: {
+        default: {}
+    }
 }
 
-export class Library {
-    library: LibraryConfig;
+const defaultLibrary: LibraryConfig = {
+    storefront: {
+        default: {}
+    }
+};
 
-    constructor(library: LibraryConfig = { default: {} }) {
+export class Library implements LibraryInterface {
+    private library: LibraryConfig;
+
+    constructor(library: LibraryConfig = defaultLibrary) {
         this.library = library;
     }
 
-    async get(symbol: string|null, pack:string|null): Promise<string|null> {
-        if (symbol === null) {
-            return null;
-        }
-
-        if (pack === null) {
-            pack = LIBRARY_DEFAULT_PACK;
-        }
-
-        const source = this.library[pack][symbol];
+    public async get(
+        symbol: string|null,
+        pack: string = LIBRARY_DEFAULT_PACK,
+        namespace: string = LIBRARY_DEFAULT_NAMESPACE
+    ): Promise<string|null> {
+        const source = this.library[namespace][pack][symbol];
 
         if (typeof source === 'string') {
             // eslint-disable-next-line no-return-await
@@ -30,17 +43,26 @@ export class Library {
         return null;
     }
 
-    add(symbol: string, source: string, pack: string = LIBRARY_DEFAULT_PACK): this {
-        this.library[pack][symbol] = source;
+    public add(
+        symbol: string,
+        source: string,
+        pack: string = LIBRARY_DEFAULT_PACK,
+        namespace: string = LIBRARY_DEFAULT_NAMESPACE
+    ): this {
+        this.library[namespace][pack][symbol] = source;
         return this;
     }
 
-    remove(symbol: string, pack: string = LIBRARY_DEFAULT_PACK): this {
-        delete this.library[pack][symbol];
+    public remove(
+        symbol: string,
+        pack: string = LIBRARY_DEFAULT_PACK,
+        namespace: string = LIBRARY_DEFAULT_NAMESPACE
+    ): this {
+        delete this.library[namespace][pack][symbol];
         return this;
     }
 
-    merge(library: LibraryConfig) {
+    public merge(library: LibraryConfig) {
         this.library = {
             ...this.library,
             ...library
@@ -55,9 +77,7 @@ export class Library {
         }
 
         const data = await response.text();
-        const temp = document.createElement('div');
-        temp.innerHTML = data;
-
-        return temp.querySelector('svg').outerHTML;
+       
+        return data;
     }
 }

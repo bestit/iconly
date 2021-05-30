@@ -15,20 +15,27 @@
   </style>
 </head>
 <body>
-  <img src="/public/icons/check-solid.svg" alt="">
-  <test-icon symbol="check"></test-icon>
+  <img src="/public/icons/storefront/default/atom.svg" alt="">
+  <img src="/public/icons/storefront/default/check.svg" alt="">
   <test-icon symbol="atom"></test-icon>
-  <test-icon symbol="atom43645"></test-icon>
+  <test-icon symbol="check"></test-icon>
+  <test-icon>
+    <button type="button">Button</button>
+  </test-icon>
   <script src="../_bundles/icon-element.js"></script>
   <script type="text/javascript">
-    IconElement.createLibrary({
-      default: {
-          check: '/public/icons/check-solid.svg',
-          atom: '/public/icons/atom-solid.svg',
-          atom43645: '43534',
+    // IconElement.IconElementService.setLibrary({
+    //   fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
+    // })
+    IconElement.IconElementService.setLibrary({
+      storefront: {
+        default: {
+          atom: '/public/icons/storefront/default/atom.svg',
+          check: '/public/icons/storefront/default/check.svg',
         }
-    })
-    IconElement.createElement('test-icon');
+      }
+    });
+    IconElement.IconElementService.createElement('test-icon');
   </script>
 </body>
 </html>
