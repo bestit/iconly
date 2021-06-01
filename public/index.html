@@ -1,35 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Icon Element</title>
-  <style type="text/css">
-    img,
-    test-icon {
-      display: block;
-      height: 24px;
-      width: 24px;
-    }
-  </style>
-</head>
-<body>
-  <img src="/public/icons/storefront/default/atom.svg" alt="">
-  <img src="/public/icons/storefront/default/check.svg" alt="">
-  <test-icon symbol="atom"></test-icon>
-  <test-icon symbol="check"></test-icon>
-  <test-icon symbol="cat" namespace="theme"></test-icon>
-  <test-icon>
-    <button type="button">Button</button>
-  </test-icon>
-  <script src="../_bundles/icon-element.js"></script>
-  <script type="text/javascript">
-    IconElement.IconService.config({
-      fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
-
-    });
-    IconElement.IconService.createElement('test-icon');
-  </script>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Icon Element</title>
+        <style type="text/css">
+            img,
+            test-icon {
+                display: block;
+                height: 24px;
+                width: 24px;
+            }
+        </style>
+    </head>
+    <body>
+        <img src="/public/icons/storefront/default/atom.svg" alt="" />
+        <img src="/public/icons/storefront/default/check.svg" alt="" />
+        <test-icon symbol="atom"></test-icon>
+        <test-icon symbol="check"></test-icon>
+        <test-icon symbol="cat" namespace="theme"></test-icon>
+        <test-icon>
+            <button type="button">Button</button>
+        </test-icon>
+        <script src="../_bundles/icon-element.js"></script>
+        <script type="text/javascript">
+            IconElement.IconService.config({
+                fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
+            });
+            IconElement.IconService.createElement('test-icon');
+        </script>
+    </body>
 </html>

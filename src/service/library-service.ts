@@ -1,4 +1,5 @@
 import { Library, LibraryInterface } from '../classes/library';
+import { ElementAttributesInterface } from '../classes/custom-element';
 
 export class LibraryService {
     private static instance: Library;
@@ -11,10 +12,24 @@ export class LibraryService {
     }
 
     public static getLibrary(): LibraryInterface {
-        return this.getInstance().getLibrary();
+        return LibraryService.getInstance().getLibrary();
     }
 
     public static merge(library: LibraryInterface) {
-        this.getInstance().merge(library);
+        LibraryService.getInstance().merge(library);
+    }
+
+    public static isInLibrary(attributes: ElementAttributesInterface): boolean {
+        const library = LibraryService.getLibrary();
+
+        if (typeof library[attributes.namespace] === 'undefined') {
+            return false;
+        }
+
+        if (typeof library[attributes.namespace][attributes.pack] === 'undefined') {
+            return false;
+        }
+
+        return typeof library[attributes.namespace][attributes.pack][attributes.symbol] !== 'undefined';
     }
 }

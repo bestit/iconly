@@ -5,7 +5,10 @@ import { LibraryHandler } from '../handler/library-handler';
 export class IconHandlerService {
     private static instance: IconHandler;
 
-    public static async getIcon(attributes: Object): Promise<string|null> {
+    /**
+     * @throws {Error}
+     */
+    public static getIcon(attributes: Object): Promise<string> {
         if (!IconHandlerService.instance) {
             IconHandlerService.instance = new IconHandler(
                 new FetchHandler(),
@@ -13,7 +16,6 @@ export class IconHandlerService {
             );
         }
 
-        // eslint-disable-next-line no-return-await
-        return await IconHandlerService.instance.getIcon(attributes);
+        return IconHandlerService.instance.getIcon(attributes);
     }
 }

@@ -4,7 +4,7 @@ export interface IconHandlerInterface {
     // eslint-disable-next-line no-unused-vars
     supports(attributes: ElementAttributesInterface): boolean,
     // eslint-disable-next-line no-unused-vars
-    getIcon(attributes: ElementAttributesInterface): Promise<string|null>
+    getIcon(attributes: ElementAttributesInterface): Promise<string>
 }
 
 export class IconHandler {
@@ -14,7 +14,10 @@ export class IconHandler {
         this.iconHandlers = [...params];
     }
 
-    async getIcon(attributes: ElementAttributesInterface): Promise<string|null> {
+    /**
+     * @throws {Error}
+     */
+    public getIcon(attributes: ElementAttributesInterface): Promise<string> {
         let iconHandler: IconHandlerInterface|null = null;
 
         this.iconHandlers.forEach((handler) => {
@@ -23,7 +26,10 @@ export class IconHandler {
             }
         });
 
-        // eslint-disable-next-line no-return-await
-        return await iconHandler.getIcon(attributes);
+        if (iconHandler === null) {
+            throw new Error('No handler found');
+        }
+
+        return iconHandler.getIcon(attributes);
     }
 }

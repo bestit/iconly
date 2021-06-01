@@ -79,7 +79,7 @@ export class CustomElement extends HTMLElement {
             .then(data => {
                 this.innerHTML = data;
             }).catch(() => {
-                this.innerHTML = '';
+                this.classList.add('has-error');
             });
     }
 }
