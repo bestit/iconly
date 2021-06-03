@@ -1,7 +1,7 @@
 import { LIBRARY_DEFAULT_NAMESPACE, LIBRARY_DEFAULT_PACK } from './library';
 import { IconHandlerService } from '../service/icon-handler-service';
 
-export interface ElementAttributesInterface {
+export interface ElementAttributesInterface extends Object {
     symbol?: string|null,
     pack?: string|null,
     namespace?: string|null,
@@ -78,8 +78,9 @@ export class CustomElement extends HTMLElement {
             })
             .then(data => {
                 this.innerHTML = data;
-            }).catch(() => {
-                this.classList.add('has-error');
+            }).catch((error) => {
+                this.classList.add('has--error');
+                console.error(error);
             });
     }
 }

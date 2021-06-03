@@ -19,6 +19,14 @@ export class LibraryService {
         LibraryService.getInstance().merge(library);
     }
 
+    public static getSymbol(attributes: ElementAttributesInterface): string|null {
+        if (!LibraryService.isInLibrary(attributes)) {
+            return null;
+        }
+
+        return LibraryService.getLibrary()[attributes.namespace][attributes.pack][attributes.symbol];
+    }
+
     public static isInLibrary(attributes: ElementAttributesInterface): boolean {
         const library = LibraryService.getLibrary();
 
