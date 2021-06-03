@@ -11,7 +11,7 @@ export class NullHandler implements IconHandlerInterface {
             return true;
         }
 
-        return attributes.symbol === null;
+        return attributes.symbol === null || attributes.symbol === '';
     }
 
     /**
