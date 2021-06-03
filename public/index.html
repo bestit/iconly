@@ -6,11 +6,37 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>Icon Element</title>
         <style type="text/css">
+            section + section {
+                margin-top: 50px;
+            }
+
             img,
             test-icon {
                 display: block;
                 height: 24px;
                 width: 24px;
+            }
+
+            test-icon[mode="wrap"] {
+                height: auto;
+                width: auto;
+            }
+
+            test-icon[mode="wrap"] + test-icon[mode="wrap"] {
+                margin-top: 30px;
+            }
+
+            test-icon.has--error {
+                background-image: url("/public/icons/storefront/default/error.svg");
+            }
+
+            button {
+                /*noinspection CssUnresolvedCustomProperty*/
+                background-image: var(--icon, none);
+                background-position: calc(100% - 5px) center;
+                background-repeat: no-repeat;
+                background-size: 12px 12px;
+                padding-right: 24px;
             }
         </style>
     </head>
@@ -32,8 +58,20 @@
         </section>
 
         <section>
-            <h2>Null Handler</h2>
+            <h2>Null Handler with default background</h2>
             <test-icon></test-icon>
+        </section>
+
+        <section>
+            <h2>Wrapping existing elements and injecting a css variable</h2>
+            <test-icon symbol="check" mode="wrap">
+                <button type="button">Button</button>
+                <button type="button">Button</button>
+            </test-icon>
+
+            <test-icon symbol="atom" mode="wrap">
+                <button type="button">Button</button>
+            </test-icon>
         </section>
 
 
