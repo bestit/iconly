@@ -19,10 +19,14 @@ export class Library {
         return this.library;
     }
 
-    public set(
+    public add(
         attributes: ElementAttributesInterface,
         source: string,
     ): this {
+        if (!this.validAttributes(attributes)) {
+            return this;
+        }
+
         this.merge(
             this.library,
             {
@@ -37,6 +41,10 @@ export class Library {
     }
 
     public remove(attributes: ElementAttributesInterface): this {
+        if (!this.validAttributes(attributes)) {
+            return this;
+        }
+
         delete this.library[attributes.namespace][attributes.pack][attributes.symbol];
         return this;
     }
@@ -58,5 +66,18 @@ export class Library {
         }
 
         return this;
+    }
+
+    private validAttributes(attributes: ElementAttributesInterface): boolean {
+        if (
+            typeof attributes === 'undefined' ||
+            typeof attributes.namespace === 'undefined' ||
+            typeof attributes.pack === 'undefined' ||
+            typeof attributes.symbol === 'undefined'
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }
