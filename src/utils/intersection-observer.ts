@@ -18,7 +18,9 @@ export const createIntersectionObserver = function(elementName: string): void {
 
                     customElement.dispatchEvent(new CustomEvent(
                         `${elementName}-intersection`,
-                        {}
+                        {
+                            bubbles: true,
+                        }
                     ));
 
                     observer.unobserve(customElement);

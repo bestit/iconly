@@ -90,16 +90,28 @@ export class CustomElement extends HTMLElement {
                 }
 
                 this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
+                    bubbles: true,
                     detail: {
                         success: true,
+                        attributes: {
+                            symbol: this.symbol,
+                            pack: this.pack || LIBRARY_DEFAULT_PACK,
+                            namespace: this.namespace || LIBRARY_DEFAULT_NAMESPACE
+                        },
                     }
                 }));
             }).catch((error) => {
                 this.classList.add('has--error');
                 this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
+                    bubbles: true,
                     detail: {
                         success: false,
-                        message: error
+                        message: error.message,
+                        attributes: {
+                            symbol: this.symbol,
+                            pack: this.pack || LIBRARY_DEFAULT_PACK,
+                            namespace: this.namespace || LIBRARY_DEFAULT_NAMESPACE
+                        },
                     }
                 }));
                 console.error(error);

@@ -208,7 +208,16 @@
                     // Remove css variable from button
                     target.style.removeProperty('--icon');
                 });
-            })
+            });
+
+            // Event bubbling
+            document.addEventListener('test-icon-loaded', event => {
+                    console.debug(event);
+            });
+
+            document.addEventListener('test-icon-intersection', event => {
+                console.debug(event);
+            });
         </script>
     </body>
 </html>
