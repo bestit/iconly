@@ -24,7 +24,7 @@ export class LibraryService {
     }
 
     public static merge(library: LibraryInterface) {
-        LibraryService.getInstance().merge(library);
+        LibraryService.getInstance().merge(LibraryService.getLibrary(), library);
     }
 
     public static getSymbol(attributes: ElementAttributesInterface): string|null {

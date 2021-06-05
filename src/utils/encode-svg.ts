@@ -10,3 +10,10 @@ export const encodeSvg = function(inlineSvg: string): string {
 
     return inlineSvg.replace(symbols, encodeURIComponent);
 };
+
+export const encodeCssUrl = function(inlineSvg: string): string {
+    'use strict';
+    const encodedSvg = encodeSvg(inlineSvg);
+
+    return `url("data:image/svg+xml,${encodedSvg}")`;
+};

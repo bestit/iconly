@@ -10,7 +10,7 @@
         <!--suppress CssUnresolvedCustomProperty -->
         <style type="text/css">
             :root {
-                --icon-size: 24px;
+                --icon-size: 32px;
                 --icon-padding: 2px;
                 --icon-border: 1px solid #0004;
                 --icon-error-url: url("/public/icons/storefront/default/error.svg");
@@ -216,16 +216,17 @@
             IconElement.IconService.config({
                 elementName: 'test-icon',
                 fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
-                library: {
-                    storefront: {
-                        default: {
-                            atom: '/public/icons/storefront/default/atom.svg',
-                            // Directly inline svg or use require/import in build process
-                            check: '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" class="svg-inline--fa fa-check fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg>',
-                        }
-                    }
-                }
             });
+
+            IconElement.IconService.setLibrary({
+                storefront: {
+                    default: {
+                        atom: '/public/icons/storefront/default/atom.svg',
+                        // Directly inline svg or use require/import in build process
+                        check: '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" class="svg-inline--fa fa-check fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg>',
+                    }
+                },
+            })
 
             // Create the custom icon element with th desired name
             IconElement.IconService.createElement();

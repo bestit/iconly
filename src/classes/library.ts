@@ -1,11 +1,11 @@
 import { ElementAttributesInterface } from './custom-element';
 
-export interface LibraryInterface {
-    [index: string]: {
-        [index: string]: {
-            [index: string]: string
+export interface LibraryInterface extends Object {
+    [propName: string]: {
+        [propName: string]: {
+            [propName: string]: string
         }
-    }
+    }|string|Function
 }
 
 export class Library {
@@ -19,11 +19,20 @@ export class Library {
         return this.library;
     }
 
-    public add(
+    public set(
         attributes: ElementAttributesInterface,
         source: string,
     ): this {
-        this.library[attributes.namespace][attributes.pack][attributes.symbol] = source;
+        this.merge(
+            this.library,
+            {
+                [attributes.namespace]: {
+                    [attributes.pack]: {
+                        [attributes.symbol]: source,
+                    }
+                }
+            }
+        );
         return this;
     }
 
@@ -32,10 +41,22 @@ export class Library {
         return this;
     }
 
-    public merge(library: LibraryInterface) {
-        this.library = {
-            ...this.library,
-            ...library
-        };
+    public merge(target: Object, source: Object): this {
+        for (const key of Object.keys(source)) {
+            if (source[key] instanceof Object && typeof target[key] === 'undefined') {
+                target[key] = {};
+                this.merge(target[key], source[key]);
+            }
+
+            if (source[key] instanceof Object && typeof target[key] !== 'undefined') {
+                this.merge(target[key], source[key]);
+            }
+
+            if (typeof source[key] === 'string') {
+                target[key] = source[key];
+            }
+        }
+
+        return this;
     }
 }

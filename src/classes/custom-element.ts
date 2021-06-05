@@ -1,7 +1,7 @@
-import { LibraryService } from '../service/library-service';
-import { IconHandlerService } from '../service/icon-handler-service';
 import { ConfigService } from '../service/config-service';
-import { encodeSvg } from '../utils/encode-svg';
+import { IconHandlerService } from '../service/icon-handler-service';
+import { LibraryService } from '../service/library-service';
+import { encodeCssUrl } from '../utils/encode-svg';
 
 export const ELEMENT_DEFAULT_MODE = 'inline';
 export const ELEMENT_LAZY_LOADING_ATTRIBUTE = 'loading';
@@ -14,20 +14,24 @@ export interface ElementAttributesInterface extends Object {
 }
 
 export class CustomElement extends HTMLElement {
-    static get observedAttributes() {
-        return ['symbol', 'pack', 'namespace', 'rotate', 'flip'];
-    }
-
+    // Custom element tag name
     private elementName: string|null = null;
+
+    // Defaults
+    private defaultNamespace: string = LibraryService.getDefaultNamespace();
+    private defaultPack: string = LibraryService.getDefaultPack();
+
+    // Attributes
     private namespace: string|null = null;
     private pack: string|null = null;
     private symbol: string|null = null;
     private mode: string;
     private lazyLoading: boolean = false;
+
+    // Intersection observer state
     private isIntersected: boolean = false;
-    private defaultNamespace: string = LibraryService.getDefaultNamespace();
-    private defaultPack: string = LibraryService.getDefaultPack();
-    // Timeout to prevent multiple calls on multiple attribute modifications
+
+    // Timeout to prevent redundant attribtue callbacks with simultaneous attribute modifications
     private attributeChangedTimeout = null;
 
     constructor() {
@@ -42,11 +46,15 @@ export class CustomElement extends HTMLElement {
         this.registerEvents();
     }
 
-    registerEvents(): void {
+    private registerEvents(): void {
         this.addEventListener(`${this.elementName}-intersection`, this.onIntersection);
     }
 
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+    static get observedAttributes() {
+        return ['symbol', 'pack', 'namespace', 'rotate', 'flip'];
+    }
+
+    private attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
         if (oldValue === newValue) {
             return;
         }
@@ -64,27 +72,11 @@ export class CustomElement extends HTMLElement {
         }
 
         if (name === 'flip') {
-            let flipDirection: string|null;
-
-            switch (newValue) {
-            case 'horizontal':
-                flipDirection = 'scaleX(-1)';
-                break;
-            case 'vertical':
-                flipDirection = 'scaleY(-1)';
-                break;
-            case 'both':
-                flipDirection = 'scaleX(-1) scaleY(-1)';
-                break;
-            default:
-                flipDirection = null;
-            }
-
-            this.style.setProperty(`--icon-${name}`, flipDirection);
+            this.style.setProperty(`--icon-${name}`, this.flip(newValue));
         }
     }
 
-    onIconChange() {
+    private onIconChange(): void {
         if (this.attributeChangedTimeout) {
             clearTimeout(this.attributeChangedTimeout);
         }
@@ -97,12 +89,12 @@ export class CustomElement extends HTMLElement {
         );
     }
 
-    onIntersection() {
+    private onIntersection(): void {
         this.isIntersected = true;
         this.getIcon();
     }
 
-    getIcon() {
+    private getIcon(): void {
         IconHandlerService
             .getIcon({
                 symbol: this.symbol,
@@ -110,48 +102,70 @@ export class CustomElement extends HTMLElement {
                 namespace: this.namespace || this.defaultNamespace,
             })
             .then(data => {
-                this.classList.remove('has--error');
-
-                if (this.mode === 'inline') {
-                    this.innerHTML = data;
-                }
-
-                if (this.mode === 'wrap') {
-                    this.style.setProperty('--icon', this.getCssUrl(data));
-                }
-
-                this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
-                    bubbles: true,
-                    detail: {
-                        success: true,
-                        attributes: {
-                            symbol: this.symbol,
-                            pack: this.pack || this.defaultPack,
-                            namespace: this.namespace || this.defaultNamespace
-                        },
-                    }
-                }));
+                this.iconLoadedSuccess(data);
             }).catch((error) => {
-                this.classList.add('has--error');
-                this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
-                    bubbles: true,
-                    detail: {
-                        success: false,
-                        message: error.message,
-                        attributes: {
-                            symbol: this.symbol,
-                            pack: this.pack || this.defaultPack,
-                            namespace: this.namespace || this.defaultNamespace
-                        },
-                    }
-                }));
-                console.error(error);
+                this.iconLoadedError(error);
             });
     }
 
-    getCssUrl(inlineSvg: string): string {
-        const encodedSvg = encodeSvg(inlineSvg);
+    private iconLoadedSuccess(data: string): void {
+        this.classList.remove('has--error');
 
-        return `url("data:image/svg+xml,${encodedSvg}")`;
+        if (this.mode === 'inline') {
+            this.innerHTML = data;
+        }
+
+        if (this.mode === 'wrap') {
+            this.style.setProperty('--icon', encodeCssUrl(data));
+        }
+
+        this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
+            bubbles: true,
+            detail: {
+                success: true,
+                attributes: {
+                    symbol: this.symbol,
+                    pack: this.pack || this.defaultPack,
+                    namespace: this.namespace || this.defaultNamespace
+                },
+            }
+        }));
+    }
+
+    private iconLoadedError(error: Error): void {
+        this.classList.add('has--error');
+        this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
+            bubbles: true,
+            detail: {
+                success: false,
+                message: error.message,
+                attributes: {
+                    symbol: this.symbol,
+                    pack: this.pack || this.defaultPack,
+                    namespace: this.namespace || this.defaultNamespace
+                },
+            }
+        }));
+        console.error(error);
+    }
+
+    private flip(value: string): string|null {
+        let flipDirection: string|null;
+
+        switch (value) {
+        case 'horizontal':
+            flipDirection = 'scaleX(-1)';
+            break;
+        case 'vertical':
+            flipDirection = 'scaleY(-1)';
+            break;
+        case 'both':
+            flipDirection = 'scaleX(-1) scaleY(-1)';
+            break;
+        default:
+            flipDirection = null;
+        }
+
+        return flipDirection;
     }
 }

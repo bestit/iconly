@@ -1,6 +1,3 @@
-import { LibraryInterface } from '../classes/library';
-import { LibraryService } from './library-service';
-
 export interface ConfigInterface {
     elementName?: string,
     fetchPattern?: string,
@@ -9,7 +6,6 @@ export interface ConfigInterface {
     intersectionObserver?: IntersectionObserverInit,
     defaultNamespace?: string,
     defaultPack?: string,
-    library?: LibraryInterface,
 }
 
 export class ConfigService {
@@ -28,7 +24,5 @@ export class ConfigService {
             ...this.config,
             ...config
         };
-
-        LibraryService.merge(this.config.library);
     }
 }
