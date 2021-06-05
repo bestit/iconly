@@ -1,29 +1,17 @@
 import { ElementAttributesInterface } from './custom-element';
 
-export const LIBRARY_DEFAULT_NAMESPACE: string = 'storefront';
-export const LIBRARY_DEFAULT_PACK: string = 'default';
-
 export interface LibraryInterface {
     [index: string]: {
         [index: string]: {
             [index: string]: string
         }
-    };
-    storefront: {
-        default: {}
     }
 }
-
-const defaultLibrary: LibraryInterface = {
-    storefront: {
-        default: {}
-    }
-};
 
 export class Library {
     private library: LibraryInterface;
 
-    constructor(library: LibraryInterface = defaultLibrary) {
+    constructor(library: LibraryInterface = {}) {
         this.library = library;
     }
 

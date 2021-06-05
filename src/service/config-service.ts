@@ -7,6 +7,8 @@ export interface ConfigInterface {
     urlTestPattern?: RegExp,
     // eslint-disable-next-line no-undef
     intersectionObserver?: IntersectionObserverInit,
+    defaultNamespace?: string,
+    defaultPack?: string,
     library?: LibraryInterface,
 }
 

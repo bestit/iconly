@@ -1,4 +1,4 @@
-import { LIBRARY_DEFAULT_NAMESPACE, LIBRARY_DEFAULT_PACK } from './library';
+import { LibraryService } from '../service/library-service';
 import { IconHandlerService } from '../service/icon-handler-service';
 import { ConfigService } from '../service/config-service';
 import { encodeSvg } from '../utils/encode-svg';
@@ -15,7 +15,7 @@ export interface ElementAttributesInterface extends Object {
 
 export class CustomElement extends HTMLElement {
     static get observedAttributes() {
-        return ['symbol', 'pack', 'namespace'];
+        return ['symbol', 'pack', 'namespace', 'rotate', 'flip'];
     }
 
     private elementName: string|null = null;
@@ -25,11 +25,14 @@ export class CustomElement extends HTMLElement {
     private mode: string;
     private lazyLoading: boolean = false;
     private isIntersected: boolean = false;
+    private defaultNamespace: string = LibraryService.getDefaultNamespace();
+    private defaultPack: string = LibraryService.getDefaultPack();
     // Timeout to prevent multiple calls on multiple attribute modifications
     private attributeChangedTimeout = null;
 
     constructor() {
         super();
+
         this.elementName = ConfigService.getConfig().elementName;
         this.mode = this.getAttribute('mode') || ELEMENT_DEFAULT_MODE;
         this.lazyLoading =
@@ -39,17 +42,45 @@ export class CustomElement extends HTMLElement {
         this.registerEvents();
     }
 
-    registerEvents() {
+    registerEvents(): void {
         this.addEventListener(`${this.elementName}-intersection`, this.onIntersection);
     }
 
-    attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-        if (oldValue !== newValue && ['namespace', 'pack', 'symbol'].includes(name)) {
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+        if (oldValue === newValue) {
+            return;
+        }
+
+        if (['namespace', 'pack', 'symbol'].includes(name)) {
             this[name] = newValue;
 
             if (!this.lazyLoading || this.isIntersected) {
                 this.onIconChange();
             }
+        }
+
+        if (name === 'rotate') {
+            this.style.setProperty(`--icon-${name}`, newValue);
+        }
+
+        if (name === 'flip') {
+            let flipDirection: string|null;
+
+            switch (newValue) {
+            case 'horizontal':
+                flipDirection = 'scaleX(-1)';
+                break;
+            case 'vertical':
+                flipDirection = 'scaleY(-1)';
+                break;
+            case 'both':
+                flipDirection = 'scaleX(-1) scaleY(-1)';
+                break;
+            default:
+                flipDirection = null;
+            }
+
+            this.style.setProperty(`--icon-${name}`, flipDirection);
         }
     }
 
@@ -75,8 +106,8 @@ export class CustomElement extends HTMLElement {
         IconHandlerService
             .getIcon({
                 symbol: this.symbol,
-                pack: this.pack || LIBRARY_DEFAULT_PACK,
-                namespace: this.namespace || LIBRARY_DEFAULT_NAMESPACE
+                pack: this.pack || this.defaultPack,
+                namespace: this.namespace || this.defaultNamespace,
             })
             .then(data => {
                 this.classList.remove('has--error');
@@ -95,8 +126,8 @@ export class CustomElement extends HTMLElement {
                         success: true,
                         attributes: {
                             symbol: this.symbol,
-                            pack: this.pack || LIBRARY_DEFAULT_PACK,
-                            namespace: this.namespace || LIBRARY_DEFAULT_NAMESPACE
+                            pack: this.pack || this.defaultPack,
+                            namespace: this.namespace || this.defaultNamespace
                         },
                     }
                 }));
@@ -109,8 +140,8 @@ export class CustomElement extends HTMLElement {
                         message: error.message,
                         attributes: {
                             symbol: this.symbol,
-                            pack: this.pack || LIBRARY_DEFAULT_PACK,
-                            namespace: this.namespace || LIBRARY_DEFAULT_NAMESPACE
+                            pack: this.pack || this.defaultPack,
+                            namespace: this.namespace || this.defaultNamespace
                         },
                     }
                 }));

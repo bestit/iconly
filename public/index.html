@@ -7,12 +7,17 @@
         <title>Icon Element</title>
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+        <!--suppress CssUnresolvedCustomProperty -->
         <style type="text/css">
             :root {
                 --icon-size: 24px;
                 --icon-padding: 2px;
                 --icon-border: 1px solid #0004;
                 --icon-error-url: url("/public/icons/storefront/default/error.svg");
+            }
+
+            h1, h2 {
+                margin-top: 0;
             }
 
             body {
@@ -29,16 +34,18 @@
                     grid-auto-flow: row dense;
                     grid-template-columns: repeat(2, minmax(0, 1fr));
                     grid-template-rows: repeat(3, minmax(0, 1fr));
-                    gap: 20px;
+                    gap: 1rem;
                 }
+            }
+
+            section {
+                box-shadow: 3px 3px 3px #0000003E;
+                background: rgba(206, 206, 250, 0.29);
+                padding: 1rem;
             }
 
             section.full-width {
                 grid-column-end: span 2;
-            }
-
-            section + section {
-                margin-top: 50px;
             }
 
             @media (min-width: 1200px) {
@@ -66,6 +73,11 @@
                 width: auto;
             }
 
+            test-icon[mode="wrap"].has--error {
+                background: none;
+                --icon: var(--icon-error-url);
+            }
+
             test-icon[mode="wrap"] + test-icon[mode="wrap"] {
                 margin-top: 30px;
             }
@@ -81,6 +93,18 @@
                 display: block;
                 max-height: 100%;
                 max-width: 100%;
+            }
+
+            test-icon[rotate] svg {
+                transform: rotate(var(--icon-rotate));
+            }
+
+            test-icon[flip] svg {
+                transform: var(--icon-flip);
+            }
+
+            test-icon[flip][rotate] svg {
+                transform: rotate(var(--icon-rotate)) var(--icon-flip);
             }
 
             .button {
@@ -133,6 +157,30 @@
             </section>
 
             <section>
+                <h2>Rotate attribute</h2>
+                <p>Rotate the icon by x deg</p>
+                <test-icon symbol="cat" namespace="theme" rotate="20deg"></test-icon>
+                <test-icon symbol="cat" namespace="theme" rotate="60deg"></test-icon>
+                <test-icon symbol="cat" namespace="theme" rotate="180deg"></test-icon>
+            </section>
+
+            <section>
+                <h2>Flip attribute</h2>
+                <p>Flip the icon horizontally, vertically or both</p>
+                <test-icon symbol="check" flip="horizontal"></test-icon>
+                <test-icon symbol="check" flip="vertical"></test-icon>
+                <test-icon symbol="check" flip="both"></test-icon>
+            </section>
+
+            <section class="full-width">
+                <h2>Flip and rotate attribute</h2>
+                <p>Flip the icon horizontally, vertically or both</p>
+                <test-icon symbol="check" rotate="-30deg" flip="horizontal"></test-icon>
+                <test-icon symbol="check" rotate="90eg" flip="vertical"></test-icon>
+                <test-icon symbol="check" rotate="30deg" flip="both"></test-icon>
+            </section>
+
+            <section>
                 <h2>Without attributes</h2>
                 <p>No attributes, no logic.</p>
                 <test-icon></test-icon>
@@ -141,6 +189,7 @@
             <section>
                 <h2>Wrapping existing elements and injecting a css variable</h2>
                 <p>Element is used as wrapper and icon is stored as a css variable.</p>
+                <p>Javascript is used to override the variable on hover.</p>
                 <test-icon symbol="check" mode="wrap">
                     <button type="button" class="button">Button</button>
                     <button type="button" class="button">Button</button>

@@ -1,12 +1,20 @@
 import { Library, LibraryInterface } from '../classes/library';
 import { ElementAttributesInterface } from '../classes/custom-element';
+import { ConfigService } from './config-service';
+
+export const LIBRARY_DEFAULT_NAMESPACE: string = 'storefront';
+export const LIBRARY_DEFAULT_PACK: string = 'default';
 
 export class LibraryService {
     private static instance: Library;
 
     public static getInstance(): Library {
         if (!LibraryService.instance) {
-            LibraryService.instance = new Library();
+            LibraryService.instance = new Library({
+                [LibraryService.getDefaultNamespace()]: {
+                    [LibraryService.getDefaultPack()]: {}
+                }
+            });
         }
         return LibraryService.instance;
     }
@@ -39,5 +47,13 @@ export class LibraryService {
         }
 
         return typeof library[attributes.namespace][attributes.pack][attributes.symbol] !== 'undefined';
+    }
+
+    public static getDefaultNamespace(): string {
+        return ConfigService.getConfig().defaultNamespace || LIBRARY_DEFAULT_NAMESPACE;
+    }
+
+    public static getDefaultPack(): string {
+        return ConfigService.getConfig().defaultPack || LIBRARY_DEFAULT_PACK;
     }
 }
