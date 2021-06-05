@@ -33,6 +33,10 @@
                 }
             }
 
+            section.full-width {
+                grid-column-end: span 2;
+            }
+
             section + section {
                 margin-top: 50px;
             }
@@ -93,6 +97,10 @@
             .button:hover {
                 color: #f00;
             }
+
+            .spacer {
+                height: 100vh;
+            }
         </style>
     </head>
     <body>
@@ -142,12 +150,22 @@
                     <button type="button" class="button">Button</button>
                 </test-icon>
             </section>
+
+            <section class="full-width">
+                <h2>Intersection Observer</h2>
+                <p>Delayed loading until element scrolls into viewport if <b>loading="lazy"</b> is set. Scroll down to test.</p>
+                <div class="spacer"></div>
+                <test-icon symbol="loading" loading="lazy"></test-icon>
+                <div class="spacer"></div>
+                <test-icon symbol="loading" loading="lazy"></test-icon>
+            </section>
         </div>
 
         <script src="../_bundles/icon-element.js"></script>
         <script type="text/javascript">
             // Icon element config
             IconElement.IconService.config({
+                elementName: 'test-icon',
                 fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
                 library: {
                     storefront: {
@@ -161,7 +179,7 @@
             });
 
             // Create the custom icon element with th desired name
-            IconElement.IconService.createElement('test-icon');
+            IconElement.IconService.createElement();
 
             // Button event to showcase replaced colors for background svgs
             document.querySelectorAll('.button').forEach(item => {

@@ -6,9 +6,7 @@ import { fetchSvg, isUrlSource } from '../utils/fetch-svg';
 
 export class FetchHandler implements IconHandlerInterface {
     public supports(attributes: ElementAttributesInterface): boolean {
-        const config = ConfigService.getConfig();
-
-        if (config.fetchPattern === null) {
+        if (ConfigService.getConfig().fetchPattern === null) {
             return false;
         }
 
@@ -22,8 +20,8 @@ export class FetchHandler implements IconHandlerInterface {
     }
 
     private static getUrl(attributes: ElementAttributesInterface): string {
-        const config = ConfigService.getConfig();
-        let url = config.fetchPattern;
+        let url = ConfigService.getConfig().fetchPattern;
+
         url = url.replace('%NAMESPACE%', attributes.namespace);
         url = url.replace('%PACK%', attributes.pack);
         url = url.replace('%SYMBOL%', attributes.symbol);

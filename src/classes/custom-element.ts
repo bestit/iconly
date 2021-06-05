@@ -1,8 +1,11 @@
 import { LIBRARY_DEFAULT_NAMESPACE, LIBRARY_DEFAULT_PACK } from './library';
 import { IconHandlerService } from '../service/icon-handler-service';
+import { ConfigService } from '../service/config-service';
 import { encodeSvg } from '../utils/encode-svg';
 
 export const ELEMENT_DEFAULT_MODE = 'inline';
+export const ELEMENT_LAZY_LOADING_ATTRIBUTE = 'loading';
+export const ELEMENT_LAZY_LOADING_VALUE = 'lazy';
 
 export interface ElementAttributesInterface extends Object {
     symbol?: string|null,
@@ -15,24 +18,38 @@ export class CustomElement extends HTMLElement {
         return ['symbol', 'pack', 'namespace'];
     }
 
+    private elementName: string|null = null;
     private namespace: string|null = null;
     private pack: string|null = null;
     private symbol: string|null = null;
     private mode: string;
+    private lazyLoading: boolean = false;
+    private isIntersected: boolean = false;
     // Timeout to prevent multiple calls on multiple attribute modifications
     private attributeChangedTimeout = null;
 
     constructor() {
         super();
-
+        this.elementName = ConfigService.getConfig().elementName;
         this.mode = this.getAttribute('mode') || ELEMENT_DEFAULT_MODE;
+        this.lazyLoading =
+            this.getAttribute(ELEMENT_LAZY_LOADING_ATTRIBUTE) === ELEMENT_LAZY_LOADING_VALUE &&
+            'IntersectionObserver' in window;
+
+        this.registerEvents();
+    }
+
+    registerEvents() {
+        this.addEventListener(`${this.elementName}-intersection`, this.onIntersection);
     }
 
     attributeChangedCallback(name: string, oldValue: string, newValue: string) {
         if (oldValue !== newValue && ['namespace', 'pack', 'symbol'].includes(name)) {
             this[name] = newValue;
 
-            this.onIconChange();
+            if (!this.lazyLoading || this.isIntersected) {
+                this.onIconChange();
+            }
         }
     }
 
@@ -47,6 +64,11 @@ export class CustomElement extends HTMLElement {
             },
             1
         );
+    }
+
+    onIntersection() {
+        this.isIntersected = true;
+        this.getIcon();
     }
 
     getIcon() {
@@ -66,8 +88,20 @@ export class CustomElement extends HTMLElement {
                 if (this.mode === 'wrap') {
                     this.style.setProperty('--icon', this.getCssUrl(data));
                 }
+
+                this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
+                    detail: {
+                        success: true,
+                    }
+                }));
             }).catch((error) => {
                 this.classList.add('has--error');
+                this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
+                    detail: {
+                        success: false,
+                        message: error
+                    }
+                }));
                 console.error(error);
             });
     }

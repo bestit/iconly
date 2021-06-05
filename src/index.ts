@@ -1,5 +1,6 @@
 import { CustomElement } from './classes/custom-element';
 import { ConfigService, ConfigInterface } from './service/config-service';
+import { createIntersectionObserver } from './utils/intersection-observer';
 
 export const IconService = {
     config: function(config: ConfigInterface) {
@@ -7,9 +8,18 @@ export const IconService = {
         ConfigService.setConfig(config);
     },
 
-    createElement: function(name: string) {
+    createElement: function() {
         'use strict';
 
-        window.customElements.define(name, class extends CustomElement {});
+        const elementName = ConfigService.getConfig().elementName;
+
+        // Abort if no element name is set
+        if (typeof elementName !== 'string') {
+            return;
+        }
+
+        createIntersectionObserver(elementName);
+
+        window.customElements.define(elementName, CustomElement);
     },
 };
