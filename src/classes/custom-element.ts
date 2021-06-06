@@ -1,4 +1,3 @@
-import { ConfigService } from '../service/config-service';
 import { IconHandlerService } from '../service/icon-handler-service';
 import { LibraryService } from '../service/library-service';
 import { encodeCssUrl } from '../utils/encode-svg';
@@ -18,8 +17,8 @@ export class CustomElement extends HTMLElement {
     private elementName: string|null = null;
 
     // Defaults
-    private defaultNamespace: string = LibraryService.getDefaultNamespace();
-    private defaultPack: string = LibraryService.getDefaultPack();
+    private defaultNamespace: string;
+    private defaultPack: string;
 
     // Attributes
     private namespace: string|null = null;
@@ -37,7 +36,10 @@ export class CustomElement extends HTMLElement {
     constructor() {
         super();
 
-        this.elementName = ConfigService.getConfig().elementName;
+        this.elementName = this.tagName.toLowerCase();
+
+        this.defaultNamespace = LibraryService.getDefaultNamespace(this.elementName);
+        this.defaultPack = LibraryService.getDefaultPack(this.elementName);
         this.mode = this.getAttribute('mode') || ELEMENT_DEFAULT_MODE;
         this.lazyLoading =
             this.getAttribute(ELEMENT_LAZY_LOADING_ATTRIBUTE) === ELEMENT_LAZY_LOADING_VALUE &&
@@ -96,7 +98,7 @@ export class CustomElement extends HTMLElement {
 
     private getIcon(): void {
         IconHandlerService
-            .getIcon({
+            .getIcon(this.elementName, {
                 symbol: this.symbol,
                 pack: this.pack || this.defaultPack,
                 namespace: this.namespace || this.defaultNamespace,

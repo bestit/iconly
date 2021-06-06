@@ -1,28 +1,42 @@
+/* eslint-disable no-unused-vars, no-undef */
 export interface ConfigInterface {
     elementName?: string,
     fetchPattern?: string,
     urlTestPattern?: RegExp,
-    // eslint-disable-next-line no-undef
     intersectionObserver?: IntersectionObserverInit,
     defaultNamespace?: string,
     defaultPack?: string,
+    handlerCallback?: Function,
+}
+/* eslint-enable no-unused-vars, no-undef */
+
+interface ConfigInstances {
+    [propName: string]: ConfigInterface;
 }
 
-export class ConfigService {
-    private static config: ConfigInterface = {
-        // eslint-disable-next-line
-        urlTestPattern: /^(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._+~#=/]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
-        intersectionObserver: {},
-    };
+const defaultConfig: ConfigInterface = {
+    urlTestPattern:
+        /^(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._+~#=/]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
+    intersectionObserver: {},
+};
 
-    public static getConfig(): ConfigInterface {
-        return this.config;
+export class ConfigService {
+    private static configs: ConfigInstances = {};
+
+    public static getConfig(element: string): ConfigInterface {
+        if (typeof ConfigService.configs[element] === 'undefined') {
+            return defaultConfig;
+        }
+        return ConfigService.configs[element];
     }
 
-    public static setConfig(config: ConfigInterface) {
-        this.config = {
-            ...this.config,
-            ...config
+    public static setConfig(element: string, config: ConfigInterface) {
+        this.configs = {
+            ...ConfigService.configs,
+            [element]: {
+                ...defaultConfig,
+                ...config
+            }
         };
     }
 }

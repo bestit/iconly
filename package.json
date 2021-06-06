@@ -19,8 +19,7 @@
   },
   "scripts": {
     "clean": "shx rm -rf _bundles lib lib-esm",
-    "build": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && webpack --mode=production",
-    "serve": "ts-node server.ts"
+    "build": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && webpack --mode=production"
   },
   "dependencies": {}
 }

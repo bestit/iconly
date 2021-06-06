@@ -15,10 +15,10 @@ export const fetchSvg = async function(url: string): Promise<string> {
     return response.text();
 };
 
-export const isUrlSource = function(source: string): boolean {
+export const isUrlSource = function(element: string, source: string): boolean {
     'use strict';
 
-    const config = ConfigService.getConfig();
+    const config = ConfigService.getConfig(element);
 
     if (!(config.urlTestPattern instanceof RegExp)) {
         return false;

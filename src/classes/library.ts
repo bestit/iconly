@@ -23,7 +23,7 @@ export class Library {
         attributes: ElementAttributesInterface,
         source: string,
     ): this {
-        if (!this.validAttributes(attributes)) {
+        if (!Library.validAttributes(attributes)) {
             return this;
         }
 
@@ -41,7 +41,7 @@ export class Library {
     }
 
     public remove(attributes: ElementAttributesInterface): this {
-        if (!this.validAttributes(attributes)) {
+        if (!Library.validAttributes(attributes)) {
             return this;
         }
 
@@ -68,16 +68,10 @@ export class Library {
         return this;
     }
 
-    private validAttributes(attributes: ElementAttributesInterface): boolean {
-        if (
-            typeof attributes === 'undefined' ||
+    private static validAttributes(attributes: ElementAttributesInterface): boolean {
+        return !(typeof attributes === 'undefined' ||
             typeof attributes.namespace === 'undefined' ||
             typeof attributes.pack === 'undefined' ||
-            typeof attributes.symbol === 'undefined'
-        ) {
-            return false;
-        }
-
-        return true;
+            typeof attributes.symbol === 'undefined');
     }
 }

@@ -26,7 +26,7 @@ export const createIntersectionObserver = function(elementName: string): void {
                     observer.unobserve(customElement);
                 }
             });
-        }, ConfigService.getConfig().intersectionObserver);
+        }, ConfigService.getConfig(elementName).intersectionObserver);
 
         customElements.forEach(customElement => customElementObserver.observe(customElement));
     }

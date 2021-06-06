@@ -4,23 +4,23 @@ import { LibraryService } from '../service/library-service';
 import { isUrlSource } from '../utils/fetch-svg';
 
 export class LibraryInlineHandler implements IconHandlerInterface {
-    public supports(attributes: ElementAttributesInterface): boolean {
-        const symbol = LibraryService.getSymbol(attributes);
+    public supports(element: string, attributes: ElementAttributesInterface): boolean {
+        const symbol = LibraryService.getSymbol(element, attributes);
 
         if (symbol === null) {
             return false;
         }
 
-        return !isUrlSource(symbol);
+        return !isUrlSource(element, symbol);
     }
 
     /**
      * @throws {Error}
      */
-    public getIcon(attributes: ElementAttributesInterface): Promise<string> {
+    public getIcon(element: string, attributes: ElementAttributesInterface): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             try {
-                const library = LibraryService.getLibrary();
+                const library = LibraryService.getLibrary(element);
                 const source = library[attributes.namespace][attributes.pack][attributes.symbol];
 
                 resolve(source);

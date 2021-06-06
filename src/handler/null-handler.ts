@@ -2,7 +2,7 @@ import { IconHandlerInterface } from './icon-handler';
 import { ElementAttributesInterface } from '../classes/custom-element';
 
 export class NullHandler implements IconHandlerInterface {
-    public supports(attributes: ElementAttributesInterface): boolean {
+    public supports(element: string, attributes: ElementAttributesInterface): boolean {
         if (attributes.namespace === null) {
             return true;
         }
@@ -17,7 +17,7 @@ export class NullHandler implements IconHandlerInterface {
     /**
      * @throws {Error}
      */
-    public getIcon(attributes: ElementAttributesInterface): Promise<string> {
+    public getIcon(element: string, attributes: ElementAttributesInterface): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             reject(new Error(`Can't find icon matching attributes: ${JSON.stringify(attributes)}`));
         });

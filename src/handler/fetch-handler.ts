@@ -5,22 +5,21 @@ import { LibraryService } from '../service/library-service';
 import { fetchSvg, isUrlSource } from '../utils/fetch-svg';
 
 export class FetchHandler implements IconHandlerInterface {
-    public supports(attributes: ElementAttributesInterface): boolean {
-        if (ConfigService.getConfig().fetchPattern === null) {
+    public supports(element: string, attributes: ElementAttributesInterface): boolean {
+        if (ConfigService.getConfig(element).fetchPattern === null) {
             return false;
         }
 
-        const isUrl = isUrlSource(FetchHandler.getUrl(attributes));
-
-        return !LibraryService.isInLibrary(attributes) && isUrl;
+        const isUrl = isUrlSource(element, FetchHandler.getUrl(element, attributes));
+        return !LibraryService.isInLibrary(element, attributes) && isUrl;
     }
 
-    public getIcon(attributes: ElementAttributesInterface): Promise<string> {
-        return fetchSvg(FetchHandler.getUrl(attributes));
+    public getIcon(element: string, attributes: ElementAttributesInterface): Promise<string> {
+        return fetchSvg(FetchHandler.getUrl(element, attributes));
     }
 
-    private static getUrl(attributes: ElementAttributesInterface): string {
-        let url = ConfigService.getConfig().fetchPattern;
+    private static getUrl(element: string, attributes: ElementAttributesInterface): string {
+        let url = ConfigService.getConfig(element).fetchPattern;
 
         url = url.replace('%NAMESPACE%', attributes.namespace);
         url = url.replace('%PACK%', attributes.pack);

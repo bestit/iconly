@@ -1,11 +1,11 @@
 import { ElementAttributesInterface } from '../classes/custom-element';
 
+/* eslint-disable no-unused-vars */
 export interface IconHandlerInterface {
-    // eslint-disable-next-line no-unused-vars
-    supports(attributes: ElementAttributesInterface): boolean,
-    // eslint-disable-next-line no-unused-vars
-    getIcon(attributes: ElementAttributesInterface): Promise<string>
+    supports(element: string, attributes: ElementAttributesInterface): boolean,
+    getIcon(element: string, attributes: ElementAttributesInterface): Promise<string>
 }
+/* eslint-enable no-unused-vars */
 
 export class IconHandler {
     private iconHandlers: IconHandlerInterface[] = [];
@@ -17,11 +17,11 @@ export class IconHandler {
     /**
      * @throws {Error}
      */
-    public getIcon(attributes: ElementAttributesInterface): Promise<string> {
+    public getIcon(element: string, attributes: ElementAttributesInterface): Promise<string> {
         let iconHandler: IconHandlerInterface|null = null;
 
         this.iconHandlers.forEach((handler) => {
-            if (handler.supports(attributes) && iconHandler === null) {
+            if (handler.supports(element, attributes) && iconHandler === null) {
                 iconHandler = handler;
             }
         });
@@ -30,6 +30,6 @@ export class IconHandler {
             throw new Error('No handler found');
         }
 
-        return iconHandler.getIcon(attributes);
+        return iconHandler.getIcon(element, attributes);
     }
 }

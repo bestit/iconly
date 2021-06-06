@@ -5,38 +5,38 @@ import { ConfigService } from './config-service';
 export const LIBRARY_DEFAULT_NAMESPACE: string = 'storefront';
 export const LIBRARY_DEFAULT_PACK: string = 'default';
 
-export class LibraryService {
-    private static instance: Library;
+interface LibraryInstances {
+    [propName: string]: Library;
+}
 
-    public static getInstance(): Library {
-        if (!LibraryService.instance) {
-            LibraryService.instance = new Library({
-                [LibraryService.getDefaultNamespace()]: {
-                    [LibraryService.getDefaultPack()]: {}
+export class LibraryService {
+    private static instances: LibraryInstances = {};
+
+    public static getInstance(element: string): Library {
+        if (typeof LibraryService.instances[element] === 'undefined') {
+            LibraryService.instances[element] = new Library({
+                [LibraryService.getDefaultNamespace(element)]: {
+                    [LibraryService.getDefaultPack(element)]: {}
                 }
             });
         }
-        return LibraryService.instance;
+        return LibraryService.instances[element];
     }
 
-    public static getLibrary(): LibraryInterface {
-        return LibraryService.getInstance().getLibrary();
+    public static getLibrary(element: string): LibraryInterface {
+        return LibraryService.getInstance(element).getLibrary();
     }
 
-    public static merge(library: LibraryInterface) {
-        LibraryService.getInstance().merge(LibraryService.getLibrary(), library);
-    }
-
-    public static getSymbol(attributes: ElementAttributesInterface): string|null {
-        if (!LibraryService.isInLibrary(attributes)) {
+    public static getSymbol(element: string, attributes: ElementAttributesInterface): string|null {
+        if (!LibraryService.isInLibrary(element, attributes)) {
             return null;
         }
 
-        return LibraryService.getLibrary()[attributes.namespace][attributes.pack][attributes.symbol];
+        return LibraryService.getLibrary(element)[attributes.namespace][attributes.pack][attributes.symbol];
     }
 
-    public static isInLibrary(attributes: ElementAttributesInterface): boolean {
-        const library = LibraryService.getLibrary();
+    public static isInLibrary(element: string, attributes: ElementAttributesInterface): boolean {
+        const library = LibraryService.getLibrary(element);
 
         if (typeof library[attributes.namespace] === 'undefined') {
             return false;
@@ -49,11 +49,11 @@ export class LibraryService {
         return typeof library[attributes.namespace][attributes.pack][attributes.symbol] !== 'undefined';
     }
 
-    public static getDefaultNamespace(): string {
-        return ConfigService.getConfig().defaultNamespace || LIBRARY_DEFAULT_NAMESPACE;
+    public static getDefaultNamespace(element: string): string {
+        return ConfigService.getConfig(element).defaultNamespace || LIBRARY_DEFAULT_NAMESPACE;
     }
 
-    public static getDefaultPack(): string {
-        return ConfigService.getConfig().defaultPack || LIBRARY_DEFAULT_PACK;
+    public static getDefaultPack(element: string): string {
+        return ConfigService.getConfig(element).defaultPack || LIBRARY_DEFAULT_PACK;
     }
 }
