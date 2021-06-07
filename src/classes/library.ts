@@ -1,6 +1,6 @@
-import { ElementAttributesInterface } from './custom-element';
+import { AttributesInterface, ATTRIBUTE_NAMESPACE, ATTRIBUTE_PACK, ATTRIBUTE_SYMBOL } from './custom-element';
 
-export interface LibraryInterface extends Object {
+export interface LibraryTreeInterface extends Object {
     [propName: string]: {
         [propName: string]: {
             [propName: string]: string
@@ -9,30 +9,40 @@ export interface LibraryInterface extends Object {
 }
 
 export class Library {
-    private library: LibraryInterface;
+    #libraryTree: LibraryTreeInterface;
 
-    constructor(library: LibraryInterface = {}) {
-        this.library = library;
+    constructor(libraryTree: LibraryTreeInterface = {}) {
+        this.#libraryTree = libraryTree;
     }
 
-    public getLibrary(): LibraryInterface {
-        return this.library;
+    public getTree(): LibraryTreeInterface {
+        return this.#libraryTree;
+    }
+
+    public getSymbol(attributes: AttributesInterface): string|null {
+        if (!this.isInLibrary(attributes)) {
+            return null;
+        }
+
+        return this.#libraryTree[
+            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
+        ];
     }
 
     public add(
-        attributes: ElementAttributesInterface,
+        attributes: AttributesInterface,
         source: string,
     ): this {
-        if (!Library.validAttributes(attributes)) {
+        if (!Library.validattributes(attributes)) {
             return this;
         }
 
         this.merge(
-            this.library,
+            this.#libraryTree,
             {
-                [attributes.namespace]: {
-                    [attributes.pack]: {
-                        [attributes.symbol]: source,
+                [attributes[ATTRIBUTE_NAMESPACE]]: {
+                    [attributes[ATTRIBUTE_PACK]]: {
+                        [attributes[ATTRIBUTE_SYMBOL]]: source,
                     }
                 }
             }
@@ -40,38 +50,54 @@ export class Library {
         return this;
     }
 
-    public remove(attributes: ElementAttributesInterface): this {
-        if (!Library.validAttributes(attributes)) {
+    public remove(attributes: AttributesInterface): this {
+        if (!Library.validattributes(attributes)) {
             return this;
         }
 
-        delete this.library[attributes.namespace][attributes.pack][attributes.symbol];
+        delete this.#libraryTree[
+            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
+        ];
         return this;
     }
 
-    public merge(target: Object, source: Object): this {
-        for (const key of Object.keys(source)) {
-            if (source[key] instanceof Object && typeof target[key] === 'undefined') {
-                target[key] = {};
-                this.merge(target[key], source[key]);
+    public merge(targetTree: Object, sourceTree: Object): this {
+        for (const key of Object.keys(sourceTree)) {
+            if (sourceTree[key] instanceof Object && typeof targetTree[key] === 'undefined') {
+                targetTree[key] = {};
+                this.merge(targetTree[key], sourceTree[key]);
             }
 
-            if (source[key] instanceof Object && typeof target[key] !== 'undefined') {
-                this.merge(target[key], source[key]);
+            if (sourceTree[key] instanceof Object && typeof targetTree[key] !== 'undefined') {
+                this.merge(targetTree[key], sourceTree[key]);
             }
 
-            if (typeof source[key] === 'string') {
-                target[key] = source[key];
+            if (typeof sourceTree[key] === 'string') {
+                targetTree[key] = sourceTree[key];
             }
         }
 
         return this;
     }
 
-    private static validAttributes(attributes: ElementAttributesInterface): boolean {
+    public isInLibrary(attributes: AttributesInterface): boolean {
+        if (typeof this.#libraryTree[attributes[ATTRIBUTE_NAMESPACE]] === 'undefined') {
+            return false;
+        }
+
+        if (typeof this.#libraryTree[attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]] === 'undefined') {
+            return false;
+        }
+
+        return typeof this.#libraryTree[
+            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
+        ] !== 'undefined';
+    }
+
+    private static validattributes(attributes: AttributesInterface): boolean {
         return !(typeof attributes === 'undefined' ||
-            typeof attributes.namespace === 'undefined' ||
-            typeof attributes.pack === 'undefined' ||
-            typeof attributes.symbol === 'undefined');
+            typeof attributes[ATTRIBUTE_NAMESPACE] === 'undefined' ||
+            typeof attributes[ATTRIBUTE_PACK] === 'undefined' ||
+            typeof attributes[ATTRIBUTE_SYMBOL] === 'undefined');
     }
 }

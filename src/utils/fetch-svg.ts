@@ -1,4 +1,4 @@
-import { ConfigService } from '../service/config-service';
+import { ConfigInterface } from '../classes/element-data';
 
 /**
  * @throws {Error}
@@ -15,10 +15,8 @@ export const fetchSvg = async function(url: string): Promise<string> {
     return response.text();
 };
 
-export const isUrlSource = function(element: string, source: string): boolean {
+export const isUrlSource = function(config: ConfigInterface, source: string): boolean {
     'use strict';
-
-    const config = ConfigService.getConfig(element);
 
     if (!(config.urlTestPattern instanceof RegExp)) {
         return false;

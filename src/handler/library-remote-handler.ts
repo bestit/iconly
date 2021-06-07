@@ -1,23 +1,29 @@
-import { IconHandlerInterface } from './icon-handler';
-import { ElementAttributesInterface } from '../classes/custom-element';
-import { LibraryService } from '../service/library-service';
+import { IconHandlerInterface } from '../classes/icon-handler';
 import { fetchSvg, isUrlSource } from '../utils/fetch-svg';
+import { ConfigInterface } from '../classes/element-data';
+import { Library } from '../classes/library';
+import { AttributesInterface } from '../classes/custom-element';
 
 export class LibraryRemoteHandler implements IconHandlerInterface {
-    public supports(element: string, attributes: ElementAttributesInterface): boolean {
-        const symbol = LibraryService.getSymbol(element, attributes);
+    public supports(
+        attributes: AttributesInterface,
+        config: ConfigInterface,
+        library: Library
+    ): boolean {
+        const symbol = library.getSymbol(attributes);
 
         if (symbol === null) {
             return false;
         }
 
-        return isUrlSource(element, symbol);
+        return isUrlSource(config, symbol);
     }
 
-    public getIcon(element: string, attributes: ElementAttributesInterface): Promise<string> {
-        const library = LibraryService.getLibrary(element);
-        const source = library[attributes.namespace][attributes.pack][attributes.symbol];
-
-        return fetchSvg(source);
+    public getIcon(
+        attributes: AttributesInterface,
+        config: ConfigInterface,
+        library: Library
+    ): Promise<string> {
+        return fetchSvg(library.getSymbol(attributes));
     }
 }

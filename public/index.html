@@ -246,32 +246,11 @@
                 }
             );
 
-            // New custom handler
-            class TestHandler {
-                supports(element, attributes) {
-                    return true;
-                }
-
-                getIcon(element, attributes) {
-                    return new Promise((resolve, reject) => {
-                        reject(new Error('Test handler found, but threw an error'));
-                    });
-                }
-            }
-
-            // Handler callback
-            const handlerCallback = function(...handlers) {
-                // Add, remove, reorder handlers
-                handlers.unshift(new TestHandler());
-                return handlers;
-            }
-
             // Foo element
             IconElement.IconService.createElement(
                 'foo-icon',
                 {
                     fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
-                    handlerCallback: handlerCallback,
                 },{
                     storefront: {
                         default: {

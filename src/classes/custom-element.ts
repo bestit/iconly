@@ -1,59 +1,82 @@
-import { IconHandlerService } from '../service/icon-handler-service';
-import { LibraryService } from '../service/library-service';
 import { encodeCssUrl } from '../utils/encode-svg';
+import { IconService } from '../index';
+import { ElementData } from './element-data';
 
-export const ELEMENT_DEFAULT_MODE = 'inline';
-export const ELEMENT_LAZY_LOADING_ATTRIBUTE = 'loading';
-export const ELEMENT_LAZY_LOADING_VALUE = 'lazy';
+export const ATTRIBUTE_SYMBOL = 'symbol';
+export const ATTRIBUTE_PACK = 'pack';
+export const ATTRIBUTE_NAMESPACE = 'namespace';
 
-export interface ElementAttributesInterface extends Object {
-    symbol?: string|null,
-    pack?: string|null,
-    namespace?: string|null,
+export const ATTRIBUTE_ROTATE = 'rotate';
+export const ATTRIBUTE_FLIP = 'flip';
+
+export const ATTRIBUTE_MODE = 'mode';
+export const ATTRIBUTE_MODE_INLINE = 'inline';
+export const ATTRIBUTE_MODE_WRAP = 'wrap';
+
+export const ATTRIBUTE_LOADING = 'loading';
+export const ATTRIBUTE_LOADING_LAZY = 'lazy';
+export const ATTRIBUTE_LOADING_EAGER = 'eager';
+
+export interface AttributesInterface extends Object {
+    [ATTRIBUTE_SYMBOL]: string|null,
+    [ATTRIBUTE_PACK]: string|null,
+    [ATTRIBUTE_NAMESPACE]: string|null,
+
+    [ATTRIBUTE_ROTATE]: string|null,
+    [ATTRIBUTE_FLIP]: string|null,
+
+    [ATTRIBUTE_MODE]: string|null,
+    [ATTRIBUTE_LOADING]: string|null,
 }
 
 export class CustomElement extends HTMLElement {
     // Custom element tag name
-    private elementName: string|null = null;
-
-    // Defaults
-    private defaultNamespace: string;
-    private defaultPack: string;
+    #elementName: string|null = null;
+    #elementData: ElementData;
 
     // Attributes
-    private namespace: string|null = null;
-    private pack: string|null = null;
-    private symbol: string|null = null;
-    private mode: string;
-    private lazyLoading: boolean = false;
+    #attributes: AttributesInterface = {
+        [ATTRIBUTE_SYMBOL]: null,
+        [ATTRIBUTE_PACK]: null,
+        [ATTRIBUTE_NAMESPACE]: null,
+
+        [ATTRIBUTE_ROTATE]: null,
+        [ATTRIBUTE_FLIP]: null,
+
+        [ATTRIBUTE_MODE]: null,
+        [ATTRIBUTE_LOADING]: null,
+    };
 
     // Intersection observer state
-    private isIntersected: boolean = false;
+    #isIntersected: boolean = false;
 
     // Timeout to prevent redundant attribtue callbacks with simultaneous attribute modifications
-    private attributeChangedTimeout = null;
+    #attributeChangedTimeout = null;
 
     constructor() {
         super();
 
-        this.elementName = this.tagName.toLowerCase();
+        this.#elementName = this.tagName.toLowerCase();
+        this.#elementData = IconService.getElement(this.#elementName);
 
-        this.defaultNamespace = LibraryService.getDefaultNamespace(this.elementName);
-        this.defaultPack = LibraryService.getDefaultPack(this.elementName);
-        this.mode = this.getAttribute('mode') || ELEMENT_DEFAULT_MODE;
-        this.lazyLoading =
-            this.getAttribute(ELEMENT_LAZY_LOADING_ATTRIBUTE) === ELEMENT_LAZY_LOADING_VALUE &&
-            'IntersectionObserver' in window;
+        this.#attributes[ATTRIBUTE_MODE] = this.getAttribute(ATTRIBUTE_MODE);
+        this.#attributes[ATTRIBUTE_LOADING] = this.getAttribute(ATTRIBUTE_LOADING);
 
         this.registerEvents();
     }
 
     private registerEvents(): void {
-        this.addEventListener(`${this.elementName}-intersection`, this.onIntersection);
+        this.addEventListener(`${this.#elementName}-intersection`, this.onIntersection);
     }
 
     static get observedAttributes() {
-        return ['symbol', 'pack', 'namespace', 'rotate', 'flip'];
+        return [
+            ATTRIBUTE_SYMBOL,
+            ATTRIBUTE_PACK,
+            ATTRIBUTE_NAMESPACE,
+            ATTRIBUTE_ROTATE,
+            ATTRIBUTE_FLIP
+        ];
     }
 
     private attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
@@ -61,29 +84,29 @@ export class CustomElement extends HTMLElement {
             return;
         }
 
-        if (['namespace', 'pack', 'symbol'].includes(name)) {
-            this[name] = newValue;
+        this.#attributes[name] = newValue;
 
-            if (!this.lazyLoading || this.isIntersected) {
+        if ([ATTRIBUTE_SYMBOL, ATTRIBUTE_PACK, ATTRIBUTE_NAMESPACE].includes(name)) {
+            if (this.getAttributes()[ATTRIBUTE_LOADING] === ATTRIBUTE_LOADING_EAGER || this.#isIntersected) {
                 this.onIconChange();
             }
         }
 
-        if (name === 'rotate') {
+        if (name === ATTRIBUTE_ROTATE) {
             this.style.setProperty(`--icon-${name}`, newValue);
         }
 
-        if (name === 'flip') {
+        if (name === ATTRIBUTE_FLIP) {
             this.style.setProperty(`--icon-${name}`, this.flip(newValue));
         }
     }
 
     private onIconChange(): void {
-        if (this.attributeChangedTimeout) {
-            clearTimeout(this.attributeChangedTimeout);
+        if (this.#attributeChangedTimeout) {
+            clearTimeout(this.#attributeChangedTimeout);
         }
 
-        this.attributeChangedTimeout = setTimeout(
+        this.#attributeChangedTimeout = setTimeout(
             () => {
                 this.getIcon();
             },
@@ -92,17 +115,36 @@ export class CustomElement extends HTMLElement {
     }
 
     private onIntersection(): void {
-        this.isIntersected = true;
+        this.#isIntersected = true;
         this.getIcon();
     }
 
+    private getAttributes(): AttributesInterface {
+        const attributes = this.#attributes;
+        const config = this.#elementData.getConfig();
+
+        if (attributes[ATTRIBUTE_NAMESPACE] === null) {
+            attributes[ATTRIBUTE_NAMESPACE] = config.defaultNamespace;
+        }
+
+        if (attributes[ATTRIBUTE_PACK] === null) {
+            attributes[ATTRIBUTE_PACK] = config.defaultPack;
+        }
+
+        if (attributes[ATTRIBUTE_MODE] !== ATTRIBUTE_MODE_WRAP) {
+            attributes[ATTRIBUTE_MODE] = ATTRIBUTE_MODE_INLINE;
+        }
+
+        if (attributes[ATTRIBUTE_LOADING] !== ATTRIBUTE_LOADING_LAZY) {
+            attributes[ATTRIBUTE_LOADING] = ATTRIBUTE_LOADING_EAGER;
+        }
+
+        return attributes;
+    }
+
     private getIcon(): void {
-        IconHandlerService
-            .getIcon(this.elementName, {
-                symbol: this.symbol,
-                pack: this.pack || this.defaultPack,
-                namespace: this.namespace || this.defaultNamespace,
-            })
+        this.#elementData
+            .getIcon(this.getAttributes())
             .then(data => {
                 this.iconLoadedSuccess(data);
             }).catch((error) => {
@@ -113,39 +155,31 @@ export class CustomElement extends HTMLElement {
     private iconLoadedSuccess(data: string): void {
         this.classList.remove('has--error');
 
-        if (this.mode === 'inline') {
+        if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_INLINE) {
             this.innerHTML = data;
         }
 
-        if (this.mode === 'wrap') {
+        if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_WRAP) {
             this.style.setProperty('--icon', encodeCssUrl(data));
         }
 
-        this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
+        this.dispatchEvent(new CustomEvent<any>(`${this.#elementName}-loaded`, {
             bubbles: true,
             detail: {
                 success: true,
-                attributes: {
-                    symbol: this.symbol,
-                    pack: this.pack || this.defaultPack,
-                    namespace: this.namespace || this.defaultNamespace
-                },
+                attributes: this.getAttributes(),
             }
         }));
     }
 
     private iconLoadedError(error: Error): void {
         this.classList.add('has--error');
-        this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
+        this.dispatchEvent(new CustomEvent<any>(`${this.#elementName}-loaded`, {
             bubbles: true,
             detail: {
                 success: false,
                 message: error.message,
-                attributes: {
-                    symbol: this.symbol,
-                    pack: this.pack || this.defaultPack,
-                    namespace: this.namespace || this.defaultNamespace
-                },
+                attributes: this.getAttributes(),
             }
         }));
         console.error(error);

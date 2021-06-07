@@ -1,23 +1,27 @@
-import { IconHandlerInterface } from './icon-handler';
-import { ElementAttributesInterface } from '../classes/custom-element';
+import { IconHandlerInterface } from '../classes/icon-handler';
+import { AttributesInterface, ATTRIBUTE_NAMESPACE, ATTRIBUTE_PACK, ATTRIBUTE_SYMBOL } from '../classes/custom-element';
 
 export class NullHandler implements IconHandlerInterface {
-    public supports(element: string, attributes: ElementAttributesInterface): boolean {
-        if (attributes.namespace === null) {
+    public supports(
+        attributes: AttributesInterface,
+    ): boolean {
+        if (attributes[ATTRIBUTE_NAMESPACE] === null) {
             return true;
         }
 
-        if (attributes.pack === null) {
+        if (attributes[ATTRIBUTE_PACK] === null) {
             return true;
         }
 
-        return attributes.symbol === null || attributes.symbol === '';
+        return attributes[ATTRIBUTE_SYMBOL] === null || attributes[ATTRIBUTE_SYMBOL] === '';
     }
 
     /**
      * @throws {Error}
      */
-    public getIcon(element: string, attributes: ElementAttributesInterface): Promise<string> {
+    public getIcon(
+        attributes: AttributesInterface,
+    ): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             reject(new Error(`Can't find icon matching attributes: ${JSON.stringify(attributes)}`));
         });
