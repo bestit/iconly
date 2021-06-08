@@ -1,13 +1,19 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "module": "commonjs",
-    "target": "es2015",
+    "target": "es6",
+    "lib": [ "es6", "dom" ],
+    "outDir": "lib",
+    "allowSyntheticDefaultImports": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
-    "outDir": "./lib",
-    "declaration": true
+    "declaration": true,
   },
-  "include": ["src"],
-  "exclude": [
-    "node_modules"
-  ]
+  "files": [
+    "./src/index.ts"
+  ],
+  "compileOnSave": false,
+  "buildOnSave": false
 }

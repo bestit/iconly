@@ -1,54 +1,108 @@
-export class Library {
-    library: any = {};
+import { AttributesInterface, ATTRIBUTE_NAMESPACE, ATTRIBUTE_PACK, ATTRIBUTE_SYMBOL } from './custom-element';
 
-    constructor(library: any = {}) {
-        this.library = library;
+export interface LibraryTreeInterface extends Object {
+    [propName: string]: {
+        [propName: string]: {
+            [propName: string]: string
+        }
+    }|string|Function
+}
+
+export class Library {
+    #libraryTree: LibraryTreeInterface;
+
+    constructor(libraryTree: LibraryTreeInterface = {}) {
+        this.#libraryTree = libraryTree;
     }
 
-    async get(symbol: string): Promise<string|null> {
-        const entry = this.library[symbol];
+    public getTree(): LibraryTreeInterface {
+        return this.#libraryTree;
+    }
 
-        if (entry?.type === 'internal') {
-            return entry.source;
-        } else if (entry?.type === 'id') {
-            return Library.getSvgDef(entry.source);
-        } else if (entry?.type === 'url') {
-            // eslint-disable-next-line no-return-await
-            return await Library.getSvgUrl(entry.source).then(data => data);
+    public setTree(libraryTree: LibraryTreeInterface): this {
+        this.#libraryTree = libraryTree;
+        return this;
+    }
+
+    public add(
+        attributes: AttributesInterface,
+        value: string,
+    ): this {
+        if (!Library.validAttributes(attributes)) {
+            return this;
         }
 
-        return null;
+        this.mergeTree(
+            this.#libraryTree,
+            {
+                [attributes[ATTRIBUTE_NAMESPACE]]: {
+                    [attributes[ATTRIBUTE_PACK]]: {
+                        [attributes[ATTRIBUTE_SYMBOL]]: value,
+                    }
+                }
+            }
+        );
+        return this;
     }
 
-    add(symbol: string, source: string) {
-        this.library[symbol] = source;
+    public remove(attributes: AttributesInterface): this {
+        if (!Library.validAttributes(attributes)) {
+            return this;
+        }
+
+        delete this.#libraryTree[
+            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
+        ];
+        return this;
     }
 
-    merge(symbols: any) {
-        this.library = {
-            ...this.library,
-            ...symbols
-        };
+    public mergeTree(targetTree: Object, sourceTree: Object): this {
+        for (const key of Object.keys(sourceTree)) {
+            if (sourceTree[key] instanceof Object && typeof targetTree[key] === 'undefined') {
+                targetTree[key] = {};
+                this.mergeTree(targetTree[key], sourceTree[key]);
+            }
+
+            if (sourceTree[key] instanceof Object && typeof targetTree[key] !== 'undefined') {
+                this.mergeTree(targetTree[key], sourceTree[key]);
+            }
+
+            if (typeof sourceTree[key] === 'string') {
+                targetTree[key] = sourceTree[key];
+            }
+        }
+
+        return this;
     }
 
-    static getSvgDef(id: string) {
-        const svgDef = document.getElementById(id).innerHTML;
-        const inlineSvg = document.createElement('svg');
-        inlineSvg.setAttribute('version', '1.1');
-        inlineSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        inlineSvg.setAttribute('width', '16');
-        inlineSvg.setAttribute('height', '16');
-        inlineSvg.setAttribute('viewBox', '0 0 16 16');
-        inlineSvg.innerHTML = svgDef;
+    public getValue(attributes: AttributesInterface): string|null {
+        if (!this.isInLibrary(attributes)) {
+            return null;
+        }
 
-        return inlineSvg.outerHTML;
+        return this.#libraryTree[
+            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
+        ];
     }
 
-    static async getSvgUrl(url: string) {
-        const response = await fetch(url);
-        const data = await response.text();
-        const temp = document.createElement('div');
-        temp.innerHTML = data;
-        return temp.querySelector('svg').outerHTML;
+    public isInLibrary(attributes: AttributesInterface): boolean {
+        if (typeof this.#libraryTree[attributes[ATTRIBUTE_NAMESPACE]] === 'undefined') {
+            return false;
+        }
+
+        if (typeof this.#libraryTree[attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]] === 'undefined') {
+            return false;
+        }
+
+        return typeof this.#libraryTree[
+            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
+        ] !== 'undefined';
+    }
+
+    private static validAttributes(attributes: AttributesInterface): boolean {
+        return !(typeof attributes === 'undefined' ||
+            typeof attributes[ATTRIBUTE_NAMESPACE] === 'undefined' ||
+            typeof attributes[ATTRIBUTE_PACK] === 'undefined' ||
+            typeof attributes[ATTRIBUTE_SYMBOL] === 'undefined');
     }
 }

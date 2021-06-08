@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Icon Element</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+        <!--suppress CssUnresolvedCustomProperty -->
+        <style type="text/css">
+            :root {
+                --icon-size: 32px;
+                --icon-padding: 2px;
+                --icon-border: 1px solid #0004;
+                --icon-error-url: url("/public/icons/storefront/default/error.svg");
+            }
+
+            h1, h2 {
+                margin-top: 0;
+            }
+
+            body {
+                font-family: 'Roboto', sans-serif;
+            }
+
+            .grid {
+                display: grid;
+                grid-auto-flow: row;
+            }
+
+            @media (min-width: 1200px) {
+                .grid {
+                    grid-auto-flow: row dense;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    grid-template-rows: repeat(3, minmax(0, 1fr));
+                    gap: 1rem;
+                }
+            }
+
+            section {
+                box-shadow: 3px 3px 3px #0000003E;
+                background: rgba(206, 206, 250, 0.29);
+                padding: 1rem;
+            }
+
+            section.full-width {
+                grid-column-end: span 2;
+            }
+
+            @media (min-width: 1200px) {
+                section + section {
+                    margin: 0;
+                }
+            }
+
+            test-icon,
+            foo-icon,
+            storyblok-icon {
+                align-items: center;
+                border: var(--icon-border);
+                box-sizing: border-box;
+                display: inline-flex;
+                height: var(--icon-size);
+                justify-content: center;
+                padding: var(--icon-padding);
+                width: var(--icon-size);
+            }
+
+            test-icon[mode="wrap"] {
+                border: 0 none;
+                display: block;
+                height: auto;
+                padding: 0;
+                width: auto;
+            }
+
+            test-icon[mode="wrap"].has--error {
+                background: none;
+                --icon: var(--icon-error-url);
+            }
+
+            test-icon[mode="wrap"] + test-icon[mode="wrap"] {
+                margin-top: 30px;
+            }
+
+            test-icon.has--error,
+            foo-icon.has--error,
+            storyblok-icon.has--error {
+                background-image: var(--icon-error-url);
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-size: calc(100% - var(--icon-padding));
+            }
+
+            test-icon svg,
+            foo-icon svg,
+            storyblok-icon svg {
+                display: block;
+                max-height: 100%;
+                width: 100%;
+            }
+
+            test-icon[rotate] svg {
+                transform: rotate(var(--icon-rotate));
+            }
+
+            test-icon[flip] svg {
+                transform: var(--icon-flip);
+            }
+
+            test-icon[flip][rotate] svg {
+                transform: rotate(var(--icon-rotate)) var(--icon-flip);
+            }
+
+            .button {
+                background-color: #fff;
+                background-image: var(--icon, none);
+                background-position: calc(100% - 5px) center;
+                background-repeat: no-repeat;
+                background-size: 12px 12px;
+                cursor: pointer;
+                border: 1px solid #000;
+                padding-right: 24px;
+            }
+
+            .button:hover {
+                color: #f00;
+            }
+
+            .spacer {
+                height: 100vh;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Icon Element</h1>
+
+        <div class="grid">
+            <section>
+                <h2>Null Handler with default background</h2>
+                <p>Error handling for null and empty values.</p>
+                <test-icon symbol=""></test-icon>
+                <test-icon symbol></test-icon>
+            </section>
+
+            <section>
+                <h2>Library Inline Handler</h2>
+                <p>Inline SVG directly stored as a string in the library, no remote fetching neccessary.</p>
+                <test-icon symbol="check"></test-icon>
+            </section>
+
+            <section>
+                <h2>Library URL Handler</h2>
+                <p>Fetch SVG with URL is stored in library, useful to map remote svgs to a custom name.</p>
+                <test-icon symbol="atom"></test-icon>
+            </section>
+
+            <section>
+                <h2>Fetch URL Handler</h2>
+                <p>Bypasses the library completly and uses the config value "fetchPattern" to construct a URL and to fetch a SVG file.</p>
+                <test-icon symbol="cat" namespace="theme"></test-icon>
+            </section>
+
+            <section>
+                <h2>Rotate attribute</h2>
+                <p>Rotate the icon by x deg</p>
+                <test-icon symbol="cat" namespace="theme" rotate="20deg"></test-icon>
+                <test-icon symbol="cat" namespace="theme" rotate="60deg"></test-icon>
+                <test-icon symbol="cat" namespace="theme" rotate="180deg"></test-icon>
+            </section>
+
+            <section>
+                <h2>Flip attribute</h2>
+                <p>Flip the icon horizontally, vertically or both</p>
+                <test-icon symbol="check" flip="horizontal"></test-icon>
+                <test-icon symbol="check" flip="vertical"></test-icon>
+                <test-icon symbol="check" flip="both"></test-icon>
+            </section>
+
+            <section class="full-width">
+                <h2>Flip and rotate attribute</h2>
+                <p>Flip the icon horizontally, vertically or both</p>
+                <test-icon symbol="check" rotate="-30deg" flip="horizontal"></test-icon>
+                <test-icon symbol="check" rotate="90eg" flip="vertical"></test-icon>
+                <test-icon symbol="check" rotate="30deg" flip="both"></test-icon>
+            </section>
+
+            <section>
+                <h2>Without attributes</h2>
+                <p>No attributes, no logic.</p>
+                <test-icon></test-icon>
+            </section>
+
+            <section>
+                <h2>Wrapping existing elements and injecting a css variable</h2>
+                <p>Element is used as wrapper and icon is stored as a css variable.</p>
+                <p>Javascript is used to override the variable on hover.</p>
+                <test-icon symbol="check" mode="wrap">
+                    <button type="button" class="button">Button</button>
+                    <button type="button" class="button">Button</button>
+                </test-icon>
+
+                <test-icon symbol="atom" mode="wrap">
+                    <button type="button" class="button">Button</button>
+                </test-icon>
+            </section>
+
+            <section class="full-width">
+                <h2>Intersection Observer</h2>
+                <p>Delayed loading until element scrolls into viewport if <b>loading="lazy"</b> is set.</p>
+                <p>Scroll down to test.</p>
+                <div class="spacer"></div>
+                <p>Icon loading right about now.</p>
+                <test-icon symbol="loading" loading="lazy"></test-icon>
+            </section>
+
+            <section>
+                <h2>Foo element</h2>
+                <p>New foo element with separate config and library</p>
+                <foo-icon symbol="foo" loading="lazy"></foo-icon>
+            </section>
+
+            <section>
+                <h2>Storyblok element</h2>
+                <p>New storyblok element with separate fetch pattern, mapped to storyblok cdn</p>
+                <storyblok-icon symbol="newsletter" pack="6b97693f9a" namespace="108717" loading="lazy"></storyblok-icon>
+            </section>
+        </div>
+
+        <script src="../_bundles/icon-element.js"></script>
+        <script type="text/javascript">
+            // Create a custom icon element with the desired name
+            IconElement.IconService.createElement(
+                'test-icon',
+                {
+                    fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
+                },{
+                    storefront: {
+                        default: {
+                            atom: '/public/icons/storefront/default/atom.svg',
+                            // Directly inline svg or use require/import in build process
+                            check: '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" class="svg-inline--fa fa-check fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg>',
+                        }
+                    },
+                }
+            );
+
+            // Foo element
+            IconElement.IconService.createElement(
+                'foo-icon',
+                {
+                    fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
+                },{
+                    storefront: {
+                        default: {
+                            foo: '/public/icons/storefront/default/atom.svg',
+                        }
+                    },
+                }
+            );
+
+            // Storyblok element
+            IconElement.IconService.createElement(
+                'storyblok-icon',
+                {
+                    // See: https://github.com/storyblok/storyblok/issues/380
+                    fetchPattern: '//s3.amazonaws.com/a.storyblok.com/f/%NAMESPACE%/x/%PACK%/%SYMBOL%.svg',
+                },
+            );
+
+            // Button event to showcase replaced colors for background svgs
+            document.querySelectorAll('.button').forEach(item => {
+                item.addEventListener('mouseenter', event => {
+                    const target = event.target;
+
+                    // Get wrapper element
+                    const iconWrapper = target.closest('test-icon[mode="wrap"]');
+
+                    if (iconWrapper === null) {
+                        return;
+                    }
+
+                    // Get currently computed color for the button elemt
+                    const currentColor = window.getComputedStyle(event.target).color;
+
+                    // Get inline svg from wrapper
+                    let icon = iconWrapper.style.getPropertyValue('--icon');
+
+                    // Replace color and overwrite css icon varaible on button element
+                    target.style.setProperty('--icon', icon.replace('currentColor', currentColor));
+                });
+                item.addEventListener('mouseleave', event => {
+                    const target = event.target;
+
+                    // Remove css variable from button
+                    target.style.removeProperty('--icon');
+                });
+            });
+
+            // Event bubbling
+            document.addEventListener('test-icon-loaded', event => {
+                    console.debug(event);
+            });
+
+            document.addEventListener('test-icon-intersection', event => {
+                console.debug(event);
+            });
+        </script>
+    </body>
+</html>

@@ -1,24 +1,25 @@
 {
-  "name": "svg-icon-system",
+  "name": "icon-element",
   "version": "1.0.0",
   "description": "SVG icon system utilising a custom element",
   "repository": "git@github.com:s5nw/svg-icon-system.git",
   "author": "Stephan Weber <steve-weber@web.de>",
   "license": "MIT",
   "private": true,
-  "module": "lib/index.js",
-  "types": "lib/index.d.ts",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.2.0",
     "@typescript-eslint/parser": "^4.2.0",
     "eslint": "^7.9.0",
     "eslint-config-bestit-base": "^1.0.0",
-    "typescript": "^4.0.3"
+    "shx": "^0.3.3",
+    "ts-loader": "^9.2.2",
+    "typescript": "^4.3.2",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.0"
   },
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
-    "eslint": "eslint 'src/**/*.ts'"
+    "clean": "shx rm -rf _bundles lib lib-esm",
+    "build": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && webpack --mode=production"
   },
   "dependencies": {}
 }

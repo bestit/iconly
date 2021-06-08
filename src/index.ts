@@ -1,15 +1,27 @@
-import { Library } from './classes/library';
-import { createCustomElement } from './classes/custom-element';
-import { Config } from './interfaces';
+/* eslint-disable max-classes-per-file */
+import { CustomElement } from './classes/custom-element';
+import { ElementData, ConfigInterface } from './classes/element-data';
+import { LibraryTreeInterface } from './classes/library';
 
-const library = new Library();
+export class IconService {
+    private static elements: ElementData[] = [];
 
-export class SvgIconSystem {
-    config: Config;
+    public static createElement(
+        element: string,
+        config: ConfigInterface = {},
+        libraryTree: LibraryTreeInterface = {}
+    ): void {
+        IconService.elements[element] = new ElementData(element, config, libraryTree);
 
-    constructor(options: Config) {
-        this.config = options;
-        library.merge(this.config.library);
-        createCustomElement(this.config.name, library);
+        /**
+         * Define new element and use anonymous class extended from CustomElement,
+         * this allows multiple definitions with the "same" class
+         */
+        window.customElements.define(element, class extends CustomElement {});
+    }
+
+    public static getElement(element: string): ElementData {
+        return IconService.elements[element];
     }
 }
+/* eslint-enable max-classes-per-file */
