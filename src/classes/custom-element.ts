@@ -1,6 +1,7 @@
-import { encodeCssUrl } from '../utils/encode-svg';
 import { IconService } from '../index';
 import { ElementData } from './element-data';
+
+const ENCODE_SVG_SYMBOLS = /[\r\n%#()<>?[\\\]^`{|}]/g;
 
 export const ATTRIBUTE_SYMBOL = 'symbol';
 export const ATTRIBUTE_PACK = 'pack';
@@ -31,7 +32,7 @@ export interface AttributesInterface extends Object {
 
 export class CustomElement extends HTMLElement {
     // Custom element tag name
-    #elementName: string|null = null;
+    #elementName: string;
     #elementData: ElementData;
 
     // Attributes
@@ -67,9 +68,10 @@ export class CustomElement extends HTMLElement {
 
     private registerEvents(): void {
         this.addEventListener(`${this.#elementName}-intersection`, this.onIntersection);
+        this.addEventListener(`${this.#elementName}-reload`, this.onReload);
     }
 
-    static get observedAttributes() {
+    static get observedAttributes(): string[] {
         return [
             ATTRIBUTE_SYMBOL,
             ATTRIBUTE_PACK,
@@ -119,6 +121,10 @@ export class CustomElement extends HTMLElement {
         this.getIcon();
     }
 
+    private onReload(): void {
+        this.getIcon();
+    }
+
     private getAttributes(): AttributesInterface {
         const attributes = this.#attributes;
         const config = this.#elementData.getConfig();
@@ -160,7 +166,7 @@ export class CustomElement extends HTMLElement {
         }
 
         if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_WRAP) {
-            this.style.setProperty('--icon', encodeCssUrl(data));
+            this.style.setProperty('--icon', this.encodeCssUrl(data));
         }
 
         this.dispatchEvent(new CustomEvent<any>(`${this.#elementName}-loaded`, {
@@ -203,5 +209,13 @@ export class CustomElement extends HTMLElement {
         }
 
         return flipDirection;
+    }
+
+    private encodeCssUrl(inlineSvg: string): string {
+        inlineSvg = inlineSvg.replace(/"/g, '\'');
+        inlineSvg = inlineSvg.replace(/>\s+</g, '><');
+        inlineSvg = inlineSvg.replace(/\s{2,}/g, ' ');
+
+        return `url("data:image/svg+xml,${inlineSvg.replace(ENCODE_SVG_SYMBOLS, encodeURIComponent)}")`;
     }
 }

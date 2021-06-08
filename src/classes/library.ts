@@ -19,30 +19,25 @@ export class Library {
         return this.#libraryTree;
     }
 
-    public getSymbol(attributes: AttributesInterface): string|null {
-        if (!this.isInLibrary(attributes)) {
-            return null;
-        }
-
-        return this.#libraryTree[
-            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
-        ];
+    public setTree(libraryTree: LibraryTreeInterface): this {
+        this.#libraryTree = libraryTree;
+        return this;
     }
 
     public add(
         attributes: AttributesInterface,
-        source: string,
+        value: string,
     ): this {
-        if (!Library.validattributes(attributes)) {
+        if (!Library.validAttributes(attributes)) {
             return this;
         }
 
-        this.merge(
+        this.mergeTree(
             this.#libraryTree,
             {
                 [attributes[ATTRIBUTE_NAMESPACE]]: {
                     [attributes[ATTRIBUTE_PACK]]: {
-                        [attributes[ATTRIBUTE_SYMBOL]]: source,
+                        [attributes[ATTRIBUTE_SYMBOL]]: value,
                     }
                 }
             }
@@ -51,7 +46,7 @@ export class Library {
     }
 
     public remove(attributes: AttributesInterface): this {
-        if (!Library.validattributes(attributes)) {
+        if (!Library.validAttributes(attributes)) {
             return this;
         }
 
@@ -61,15 +56,15 @@ export class Library {
         return this;
     }
 
-    public merge(targetTree: Object, sourceTree: Object): this {
+    public mergeTree(targetTree: Object, sourceTree: Object): this {
         for (const key of Object.keys(sourceTree)) {
             if (sourceTree[key] instanceof Object && typeof targetTree[key] === 'undefined') {
                 targetTree[key] = {};
-                this.merge(targetTree[key], sourceTree[key]);
+                this.mergeTree(targetTree[key], sourceTree[key]);
             }
 
             if (sourceTree[key] instanceof Object && typeof targetTree[key] !== 'undefined') {
-                this.merge(targetTree[key], sourceTree[key]);
+                this.mergeTree(targetTree[key], sourceTree[key]);
             }
 
             if (typeof sourceTree[key] === 'string') {
@@ -78,6 +73,16 @@ export class Library {
         }
 
         return this;
+    }
+
+    public getValue(attributes: AttributesInterface): string|null {
+        if (!this.isInLibrary(attributes)) {
+            return null;
+        }
+
+        return this.#libraryTree[
+            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
+        ];
     }
 
     public isInLibrary(attributes: AttributesInterface): boolean {
@@ -94,7 +99,7 @@ export class Library {
         ] !== 'undefined';
     }
 
-    private static validattributes(attributes: AttributesInterface): boolean {
+    private static validAttributes(attributes: AttributesInterface): boolean {
         return !(typeof attributes === 'undefined' ||
             typeof attributes[ATTRIBUTE_NAMESPACE] === 'undefined' ||
             typeof attributes[ATTRIBUTE_PACK] === 'undefined' ||

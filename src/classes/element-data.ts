@@ -48,6 +48,14 @@ export class ElementData {
         return this.#config;
     }
 
+    public getIconHander(): IconHandler {
+        return this.#iconHandler;
+    }
+
+    public getLibrary(): Library {
+        return this.#library;
+    }
+
     public getIcon(attributes: AttributesInterface): Promise<string> {
         return this.#iconHandler.getIcon(attributes, this.#config, this.#library);
     }

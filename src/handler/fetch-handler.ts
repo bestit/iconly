@@ -1,10 +1,9 @@
-import { IconHandlerInterface } from '../classes/icon-handler';
-import { fetchSvg, isUrlSource } from '../utils/fetch-svg';
+import { AbstractHandler } from './abstract-handler';
 import { ConfigInterface } from '../classes/element-data';
 import { Library } from '../classes/library';
 import { AttributesInterface } from '../classes/custom-element';
 
-export class FetchHandler implements IconHandlerInterface {
+export class FetchHandler extends AbstractHandler {
     public supports(
         attributes: AttributesInterface,
         config: ConfigInterface,
@@ -14,7 +13,7 @@ export class FetchHandler implements IconHandlerInterface {
             return false;
         }
 
-        const isUrl = isUrlSource(config, FetchHandler.getUrl(attributes, config));
+        const isUrl = this.isUrlSource(config, FetchHandler.getUrl(attributes, config));
         return !library.isInLibrary(attributes) && isUrl;
     }
 
@@ -22,7 +21,7 @@ export class FetchHandler implements IconHandlerInterface {
         attributes: AttributesInterface,
         config: ConfigInterface
     ): Promise<string> {
-        return fetchSvg(FetchHandler.getUrl(attributes, config));
+        return this.fetchSvg(FetchHandler.getUrl(attributes, config));
     }
 
     private static getUrl(attributes: AttributesInterface, config: ConfigInterface): string {

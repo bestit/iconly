@@ -1,7 +1,7 @@
-import { IconHandlerInterface } from '../classes/icon-handler';
+import { AbstractHandler } from './abstract-handler';
 import { AttributesInterface, ATTRIBUTE_NAMESPACE, ATTRIBUTE_PACK, ATTRIBUTE_SYMBOL } from '../classes/custom-element';
 
-export class NullHandler implements IconHandlerInterface {
+export class NullHandler extends AbstractHandler {
     public supports(
         attributes: AttributesInterface,
     ): boolean {
