@@ -1,12 +1,9 @@
-'use strict';
-
-/* eslint-env node */
-const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
+import { resolve as _resolve } from 'path';
+import TerserPlugin from 'terser-webpack-plugin';
 
 const PATHS = {
     entryPoint: './src/index.ts',
-    bundles: path.resolve(__dirname, '_bundles'),
+    bundles: _resolve('./dist/umd'),
 };
 
 const config = {
@@ -60,11 +57,20 @@ const config = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: 'ts-loader',
+                use: [
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            compilerOptions: {
+                                declaration: false,
+                            },
+                        }
+                    }
+                ],
                 exclude: /node_modules/,
             },
         ],
     },
 };
 
-module.exports = config;
+export default config;
