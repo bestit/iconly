@@ -33,11 +33,11 @@ export interface AttributesInterface extends Object {
 
 export class CustomElement extends HTMLElement {
     // Custom element tag name
-    #elementName: string;
-    #elementData: ElementData;
+    private elementName: string;
+    private elementData: ElementData;
 
     // Attributes
-    #attributes: AttributesInterface = {
+    private elementAttributes: AttributesInterface = {
         [ATTRIBUTE_SYMBOL]: null,
         [ATTRIBUTE_PACK]: null,
         [ATTRIBUTE_NAMESPACE]: null,
@@ -50,26 +50,26 @@ export class CustomElement extends HTMLElement {
     };
 
     // Intersection observer state
-    #isIntersected: boolean = false;
+    private isIntersected: boolean = false;
 
     // Timeout to prevent redundant attribtue callbacks with simultaneous attribute modifications
-    #attributeChangedTimeout = null;
+    private attributeChangedTimeout = null;
 
     constructor() {
         super();
 
-        this.#elementName = this.tagName.toLowerCase();
-        this.#elementData = IconService.getElement(this.#elementName);
+        this.elementName = this.tagName.toLowerCase();
+        this.elementData = IconService.getElement(this.elementName);
 
-        this.#attributes[ATTRIBUTE_MODE] = this.getAttribute(ATTRIBUTE_MODE);
-        this.#attributes[ATTRIBUTE_LOADING] = this.getAttribute(ATTRIBUTE_LOADING);
+        this.elementAttributes[ATTRIBUTE_MODE] = this.getAttribute(ATTRIBUTE_MODE);
+        this.elementAttributes[ATTRIBUTE_LOADING] = this.getAttribute(ATTRIBUTE_LOADING);
 
         this.registerEvents();
     }
 
     private registerEvents(): void {
-        this.addEventListener(`${this.#elementName}-intersection`, this.onIntersection);
-        this.addEventListener(`${this.#elementName}-reload`, this.onReload);
+        this.addEventListener(`${this.elementName}-intersection`, this.onIntersection);
+        this.addEventListener(`${this.elementName}-reload`, this.onReload);
     }
 
     static get observedAttributes(): string[] {
@@ -87,10 +87,10 @@ export class CustomElement extends HTMLElement {
             return;
         }
 
-        this.#attributes[name] = newValue;
+        this.elementAttributes[name] = newValue;
 
         if ([ATTRIBUTE_SYMBOL, ATTRIBUTE_PACK, ATTRIBUTE_NAMESPACE].includes(name)) {
-            if (this.getAttributes()[ATTRIBUTE_LOADING] === ATTRIBUTE_LOADING_EAGER || this.#isIntersected) {
+            if (this.getAttributes()[ATTRIBUTE_LOADING] === ATTRIBUTE_LOADING_EAGER || this.isIntersected) {
                 this.onIconChange();
             }
         }
@@ -105,11 +105,11 @@ export class CustomElement extends HTMLElement {
     }
 
     private onIconChange(): void {
-        if (this.#attributeChangedTimeout) {
-            clearTimeout(this.#attributeChangedTimeout);
+        if (this.attributeChangedTimeout) {
+            clearTimeout(this.attributeChangedTimeout);
         }
 
-        this.#attributeChangedTimeout = setTimeout(
+        this.attributeChangedTimeout = setTimeout(
             () => {
                 this.getIcon();
             },
@@ -118,7 +118,7 @@ export class CustomElement extends HTMLElement {
     }
 
     private onIntersection(): void {
-        this.#isIntersected = true;
+        this.isIntersected = true;
         this.getIcon();
     }
 
@@ -127,12 +127,12 @@ export class CustomElement extends HTMLElement {
     }
 
     public getElementData(): ElementData {
-        return this.#elementData;
+        return this.elementData;
     }
 
     public getAttributes(): AttributesInterface {
-        const attributes = this.#attributes;
-        const config = this.#elementData.getConfig();
+        const attributes = this.elementAttributes;
+        const config = this.elementData.getConfig();
 
         if (attributes[ATTRIBUTE_NAMESPACE] === null) {
             attributes[ATTRIBUTE_NAMESPACE] = config.defaultNamespace;
@@ -160,7 +160,7 @@ export class CustomElement extends HTMLElement {
             return;
         }
 
-        this.#elementData
+        this.elementData
             .getIcon(this)
             .then(data => {
                 this.iconLoadedSuccess(data);
@@ -180,7 +180,7 @@ export class CustomElement extends HTMLElement {
             this.style.setProperty('--icon', this.encodeCssUrl(data));
         }
 
-        this.dispatchEvent(new CustomEvent<any>(`${this.#elementName}-loaded`, {
+        this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
             bubbles: true,
             detail: {
                 success: true,
@@ -191,7 +191,7 @@ export class CustomElement extends HTMLElement {
 
     private iconLoadedError(error: Error): void {
         this.classList.add('has--error');
-        this.dispatchEvent(new CustomEvent<any>(`${this.#elementName}-loaded`, {
+        this.dispatchEvent(new CustomEvent<any>(`${this.elementName}-loaded`, {
             bubbles: true,
             detail: {
                 success: false,

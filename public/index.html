@@ -217,13 +217,13 @@
             <section>
                 <h2>Foo element</h2>
                 <p>New foo element with separate config and library</p>
-                <foo-icon symbol="foo" loading="lazy"></foo-icon>
+                <foo-icon symbol="foo"></foo-icon>
             </section>
 
             <section>
                 <h2>Storyblok element</h2>
                 <p>New storyblok element with separate fetch pattern, mapped to storyblok cdn</p>
-                <storyblok-icon symbol="newsletter" pack="6b97693f9a" namespace="108717" loading="lazy"></storyblok-icon>
+                <storyblok-icon symbol="newsletter" pack="6b97693f9a" namespace="108717"></storyblok-icon>
             </section>
 
             <section class="full-width">
@@ -236,7 +236,16 @@
             </section>
         </div>
 
-        <script src="../dist/umd/icon-element.js"></script>
+        <!-- IE11 / Polyfills -->
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=Array.prototype.forEach%2CArray.prototype.includes%2Cfetch%2CIntersectionObserver"></script>
+        <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+        <!-- ES5 -->
+        <script src="../node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
+        <script src="../dist/es5/umd/icon-element.js"></script>
+
+        <!-- ES6  -->
+        <!-- <script src="../dist/umd/icon-element.js"></script> -->
         <script type="text/javascript">
             // Create a custom icon element with the desired name
             IconElement.IconService.createElement(
@@ -275,11 +284,12 @@
                     // See: https://github.com/storyblok/storyblok/issues/380
                     fetchPattern: '//s3.amazonaws.com/a.storyblok.com/f/%NAMESPACE%/x/%PACK%/%SYMBOL%.svg',
                 },
+                {}
             );
 
             // Button event to showcase replaced colors for background svgs
-            document.querySelectorAll('.button').forEach(item => {
-                item.addEventListener('mouseenter', event => {
+            document.querySelectorAll('.button').forEach(function(item) {
+                item.addEventListener('mouseenter', function(event) {
                     const target = event.target;
 
                     // Get wrapper element
@@ -298,7 +308,7 @@
                     // Replace color and overwrite css icon varaible on button element
                     target.style.setProperty('--icon', icon.replace('currentColor', currentColor));
                 });
-                item.addEventListener('mouseleave', event => {
+                item.addEventListener('mouseleave', function(event) {
                     const target = event.target;
 
                     // Remove css variable from button
@@ -307,11 +317,11 @@
             });
 
             // Event bubbling
-            document.addEventListener('test-icon-loaded', event => {
+            document.addEventListener('test-icon-loaded', function(event) {
                     console.debug(event);
             });
 
-            document.addEventListener('test-icon-intersection', event => {
+            document.addEventListener('test-icon-intersection', function(event) {
                 console.debug(event);
             });
         </script>

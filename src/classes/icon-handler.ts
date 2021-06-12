@@ -18,10 +18,10 @@ export interface HandlerInterface {
 /* eslint-enable no-unused-vars */
 
 export class IconHandler {
-    #handlerList: HandlerInterface[];
+    private handlerList: HandlerInterface[];
 
     constructor() {
-        this.#handlerList = [
+        this.handlerList = [
             new NullHandler(0),
             new LibraryInlineHandler(1),
             new LibraryRemoteHandler(2),
@@ -37,7 +37,7 @@ export class IconHandler {
     ): Promise<string> {
         let iconHandler: HandlerInterface|null = null;
 
-        this.#handlerList.forEach((handler) => {
+        this.handlerList.forEach((handler) => {
             if (handler.supports(element) && iconHandler === null) {
                 iconHandler = handler;
             }
@@ -51,36 +51,36 @@ export class IconHandler {
     }
 
     public getHandlerList(): HandlerInterface[] {
-        return this.#handlerList;
+        return this.handlerList;
     }
 
     public setHandlerList(...handlerList: HandlerInterface[]): this {
-        this.#handlerList = handlerList;
+        this.handlerList = handlerList;
         this.order();
 
         return this;
     }
 
     public getHandler(index: number): HandlerInterface {
-        return this.#handlerList[index];
+        return this.handlerList[index];
     }
 
     public addHandler(handler: HandlerInterface): this {
-        this.#handlerList.push(handler);
+        this.handlerList.push(handler);
         this.order();
 
         return this;
     }
 
     public removeHandler(index: number): this {
-        this.#handlerList.splice(index);
+        this.handlerList.splice(index);
         this.order();
 
         return this;
     }
 
     public order(): this {
-        this.#handlerList.sort((handlerA, handlerB) => handlerA.getPriority() - handlerB.getPriority());
+        this.handlerList.sort((handlerA, handlerB) => handlerA.getPriority() - handlerB.getPriority());
 
         return this;
     }

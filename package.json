@@ -21,6 +21,7 @@
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^4.2.0",
         "@typescript-eslint/parser": "^4.2.0",
+        "@webcomponents/webcomponentsjs": "^2.5.0",
         "eslint": "^7.9.0",
         "eslint-config-bestit-base": "^1.0.0",
         "shx": "^0.3.3",
@@ -33,9 +34,9 @@
         "clean": "shx rm -rf dist",
         "build": "yarn run clean && yarn run build:declaration && yarn run build:esm && yarn run build:commonjs && yarn run build:umd",
         "build:declaration": "tsc --declaration true --declarationDir ./dist/types --emitDeclarationOnly true",
-        "build:esm": "tsc --module es2015 --target es6 --outDir dist/esm",
-        "build:commonjs": "tsc --module commonjs --target es6 --outDir dist/commonjs",
-        "build:umd": "webpack --mode=production"
+        "build:esm": "tsc --module es2015 --target es5 --outDir dist/es5/esm && tsc --module es2015 --target es6 --outDir dist/esm",
+        "build:commonjs": "tsc --module commonjs --target es5 --outDir dist/es5/commonjs && tsc --module commonjs --target es6 --outDir dist/commonjs",
+        "build:umd": "webpack --mode=production --config-name es5 && webpack --mode=production --config-name es6"
     },
     "dependencies": {}
 }

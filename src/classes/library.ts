@@ -9,18 +9,18 @@ export interface LibraryTreeInterface extends Object {
 }
 
 export class Library {
-    #libraryTree: LibraryTreeInterface;
+    private libraryTree: LibraryTreeInterface;
 
     constructor(libraryTree: LibraryTreeInterface = {}) {
-        this.#libraryTree = libraryTree;
+        this.libraryTree = libraryTree;
     }
 
     public getTree(): LibraryTreeInterface {
-        return this.#libraryTree;
+        return this.libraryTree;
     }
 
     public setTree(libraryTree: LibraryTreeInterface): this {
-        this.#libraryTree = libraryTree;
+        this.libraryTree = libraryTree;
         return this;
     }
 
@@ -33,7 +33,7 @@ export class Library {
         }
 
         this.mergeTree(
-            this.#libraryTree,
+            this.libraryTree,
             {
                 [attributes[ATTRIBUTE_NAMESPACE]]: {
                     [attributes[ATTRIBUTE_PACK]]: {
@@ -50,7 +50,7 @@ export class Library {
             return this;
         }
 
-        delete this.#libraryTree[
+        delete this.libraryTree[
             attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
         ];
         return this;
@@ -80,21 +80,21 @@ export class Library {
             return null;
         }
 
-        return this.#libraryTree[
+        return this.libraryTree[
             attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
         ];
     }
 
     public isInLibrary(attributes: AttributesInterface): boolean {
-        if (typeof this.#libraryTree[attributes[ATTRIBUTE_NAMESPACE]] === 'undefined') {
+        if (typeof this.libraryTree[attributes[ATTRIBUTE_NAMESPACE]] === 'undefined') {
             return false;
         }
 
-        if (typeof this.#libraryTree[attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]] === 'undefined') {
+        if (typeof this.libraryTree[attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]] === 'undefined') {
             return false;
         }
 
-        return typeof this.#libraryTree[
+        return typeof this.libraryTree[
             attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
         ] !== 'undefined';
     }
