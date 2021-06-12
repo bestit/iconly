@@ -42,6 +42,7 @@ const config = [
             ...baseConfig.output,
             path: PATHS.bundle.es5,
         },
+        target: ['web', 'es5'],
         module: {
             rules: [
                 {
