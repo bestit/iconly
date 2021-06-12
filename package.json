@@ -28,7 +28,8 @@
         "ts-loader": "^9.2.2",
         "typescript": "^4.3.2",
         "webpack": "^5.38.1",
-        "webpack-cli": "^4.7.0"
+        "webpack-cli": "^4.7.0",
+        "webpack-dev-server": "^3.11.2"
     },
     "scripts": {
         "clean": "shx rm -rf dist",
@@ -36,7 +37,9 @@
         "build:declaration": "tsc --declaration true --declarationDir ./dist/types --emitDeclarationOnly true",
         "build:esm": "tsc --module es2015 --target es5 --outDir dist/es5/esm && tsc --module es2015 --target es6 --outDir dist/esm",
         "build:commonjs": "tsc --module commonjs --target es5 --outDir dist/es5/commonjs && tsc --module commonjs --target es6 --outDir dist/commonjs",
-        "build:umd": "webpack --mode=production --config-name es5 && webpack --mode=production --config-name es6"
+        "build:umd": "webpack --mode=production --config-name es5 && webpack --mode=production --config-name es6",
+        "serve:es5": "webpack serve --config-name es5 --mode=development",
+        "serve:es6": "webpack serve --config-name es6 --mode=development"
     },
     "dependencies": {}
 }

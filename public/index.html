@@ -10,7 +10,7 @@
         <!--suppress CssUnresolvedCustomProperty -->
         <style type="text/css">
             :root {
-                --icon-error-url: url("/public/icons/storefront/default/error.svg");
+                --icon-error-url: url("/icons/storefront/default/error.svg");
             }
 
             h1, h2 {
@@ -90,7 +90,7 @@
             test-icon.has--error,
             foo-icon.has--error,
             storyblok-icon.has--error {
-                background-image: url("/public/icons/storefront/default/error.svg");
+                background-image: url("/icons/storefront/default/error.svg");
                 background-repeat: no-repeat;
                 background-position: center center;
                 background-size: calc(100% - 2px);
@@ -242,24 +242,23 @@
 
         <!-- IE11 / Polyfills -->
         <script src="https://polyfill.io/v3/polyfill.min.js?features=Element.prototype.closest%2CArray.prototype.forEach%2CArray.prototype.includes%2Cfetch%2CIntersectionObserver"></script>
-        <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+        <script src="./@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
 
-        <!-- ES5 -->
-        <script src="../node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
-        <script src="../dist/es5/umd/icon-element.js"></script>
+        <!-- Support for ES5 compiled custom elements -->
+        <script src="./@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
 
-        <!-- ES6  -->
-        <!-- <script src="../dist/umd/icon-element.js"></script> -->
+        <!-- Webpack server output  -->
+        <script src="/icon-element.js"></script>
         <script type="text/javascript">
             // Create a custom icon element with the desired name
             IconElement.IconService.createElement(
                 'test-icon',
                 {
-                    fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
+                    fetchPattern: '/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
                 },{
                     storefront: {
                         default: {
-                            atom: '/public/icons/storefront/default/atom.svg',
+                            atom: '/icons/storefront/default/atom.svg',
                             // Directly inline svg or use require/import in build process
                             check: '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" class="svg-inline--fa fa-check fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg>',
                         }
@@ -271,11 +270,11 @@
             IconElement.IconService.createElement(
                 'foo-icon',
                 {
-                    fetchPattern: '/public/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
+                    fetchPattern: '/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
                 },{
                     storefront: {
                         default: {
-                            foo: '/public/icons/storefront/default/atom.svg',
+                            foo: '/icons/storefront/default/atom.svg',
                         }
                     },
                 }

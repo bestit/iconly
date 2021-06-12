@@ -19,6 +19,7 @@ const baseConfig = {
         libraryTarget: 'umd',
         library: 'IconElement',
         umdNamedDefine: true,
+        publicPath: '/',
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
@@ -31,6 +32,13 @@ const baseConfig = {
                 include: /\.min\.js$/,
             }),
         ],
+    },
+    devServer: {
+        contentBase: [
+            _resolve('./public'),
+            _resolve('./node_modules')
+        ],
+        publicPath: '/',
     },
 };
 
@@ -75,6 +83,7 @@ const config = [
             ...baseConfig.output,
             path: PATHS.bundle.es6,
         },
+        target: ['web', 'es6'],
         module: {
             rules: [
                 {
