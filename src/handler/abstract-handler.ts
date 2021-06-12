@@ -4,10 +4,10 @@ import { CustomElement } from '../classes/custom-element';
 
 /* eslint-disable no-unused-vars */
 export abstract class AbstractHandler implements HandlerInterface {
-    #priority: number = 0;
+    private priority: number = 0;
 
     constructor(priority: number) {
-        this.#priority = priority;
+        this.priority = priority;
     }
 
     public abstract supports(
@@ -19,11 +19,11 @@ export abstract class AbstractHandler implements HandlerInterface {
     ): Promise<string>
 
     public getPriority(): number {
-        return this.#priority;
+        return this.priority;
     }
 
     public setPriority(priority: number): void {
-        this.#priority = priority;
+        this.priority = priority;
     }
 
     /**

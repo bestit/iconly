@@ -22,48 +22,48 @@ const defaultConfig: ConfigInterface = {
 };
 
 export class ElementData {
-    #element: string;
-    #config: ConfigInterface;
-    #library: Library;
-    #iconHandler: IconHandler;
+    private element: string;
+    private config: ConfigInterface;
+    private library: Library;
+    private iconHandler: IconHandler;
 
     constructor(
         element: string,
         config: ConfigInterface = {},
         libraryTree: LibraryTreeInterface = {}
     ) {
-        this.#element = element;
-        this.#config = {
+        this.element = element;
+        this.config = {
             ...defaultConfig,
             ...config
         };
-        this.#library = new Library(libraryTree);
-        this.#iconHandler = new IconHandler();
+        this.library = new Library(libraryTree);
+        this.iconHandler = new IconHandler();
 
         this.createIntersectionObserver();
     }
 
     public getConfig(): ConfigInterface {
-        return this.#config;
+        return this.config;
     }
 
     public getIconHander(): IconHandler {
-        return this.#iconHandler;
+        return this.iconHandler;
     }
 
     public getLibrary(): Library {
-        return this.#library;
+        return this.library;
     }
 
     public getIcon(element: CustomElement): Promise<string> {
-        return this.#iconHandler.getIcon(element);
+        return this.iconHandler.getIcon(element);
     }
 
     private createIntersectionObserver(): void {
         if ('IntersectionObserver' in window) {
             const customElements = Array.from(
                 document.querySelectorAll(
-                    `${this.#element}[${ATTRIBUTE_LOADING}="${ATTRIBUTE_LOADING_LAZY}"]`
+                    `${this.element}[${ATTRIBUTE_LOADING}="${ATTRIBUTE_LOADING_LAZY}"]`
                 )
             );
 
@@ -73,7 +73,7 @@ export class ElementData {
                         const customElement = entry.target;
 
                         customElement.dispatchEvent(new CustomEvent(
-                            `${this.#element}-intersection`,
+                            `${this.element}-intersection`,
                             {
                                 bubbles: true,
                             }

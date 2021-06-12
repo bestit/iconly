@@ -3,48 +3,27 @@ import TerserPlugin from 'terser-webpack-plugin';
 
 const PATHS = {
     entryPoint: './src/index.ts',
-    bundles: _resolve('./dist/umd'),
+    bundle: {
+        es5: _resolve('./dist/es5/umd'),
+        es6: _resolve('./dist/umd'),
+    },
 };
 
-const config = {
-    /*
-     * These are the entry point of our library. We tell webpack to use
-     * The name we assign later, when creating the bundle. We also use
-     * The name to filter the second entry point for applying code
-     * Minification via UglifyJS
-     */
+const baseConfig = {
     entry: {
         'icon-element': [PATHS.entryPoint],
         'icon-element.min': [PATHS.entryPoint],
     },
-
-    /*
-     * The output defines how and where we want the bundles. The special
-     * Value `[name]` in `filename` tell Webpack to use the name we defined above.
-     * We target a UMD and name it MyLib. When including the bundle in the browser
-     * It will be accessible at `window.MyLib`
-     */
     output: {
-        path: PATHS.bundles,
         filename: '[name].js',
         libraryTarget: 'umd',
         library: 'IconElement',
         umdNamedDefine: true,
     },
-
-    /*
-     * Add resolve for `tsx` and `ts` files, otherwise Webpack would
-     * Only look for common JavaScript file extension (.js)
-     */
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
     },
-
-    /*
-     * Activate source maps for the bundles in order to preserve the original
-     * Source when the user debugs the application
-     */
-    devtool: 'source-map',
+    devtool: 'nosources-source-map',
     optimization: {
         minimize: true,
         minimizer: [
@@ -53,24 +32,69 @@ const config = {
             }),
         ],
     },
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: [
-                    {
-                        loader: 'ts-loader',
-                        options: {
-                            compilerOptions: {
-                                declaration: false,
-                            },
-                        }
-                    }
-                ],
-                exclude: /node_modules/,
-            },
-        ],
-    },
 };
+
+const config = [
+    {
+        ...baseConfig,
+        name: 'es5',
+        output: {
+            ...baseConfig.output,
+            path: PATHS.bundle.es5,
+        },
+        target: ['web', 'es5'],
+        module: {
+            rules: [
+                {
+                    test: /\.tsx?$/,
+                    use: [
+                        {
+                            loader: 'ts-loader',
+                            options: {
+                                compilerOptions: {
+                                    declaration: false,
+                                    target: 'es5',
+                                    module: 'commonjs',
+                                    lib: [
+                                        'es2015',
+                                        'dom'
+                                    ],
+                                },
+                            }
+                        }
+                    ],
+                    exclude: /node_modules/,
+                },
+            ],
+        },
+    },
+    {
+        ...baseConfig,
+        name: 'es6',
+        output: {
+            ...baseConfig.output,
+            path: PATHS.bundle.es6,
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.tsx?$/,
+                    use: [
+                        {
+                            loader: 'ts-loader',
+                            options: {
+                                compilerOptions: {
+                                    declaration: false,
+                                    target: 'es6',
+                                },
+                            }
+                        }
+                    ],
+                    exclude: /node_modules/,
+                },
+            ],
+        },
+    }
+];
 
 export default config;
