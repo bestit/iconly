@@ -2,21 +2,15 @@ import { FetchHandler } from '../handler/fetch-handler';
 import { LibraryRemoteHandler } from '../handler/library-remote-handler';
 import { LibraryInlineHandler } from '../handler/library-inline-handler';
 import { NullHandler } from '../handler/null-handler';
-import { ConfigInterface } from './element-data';
-import { Library } from './library';
-import { AttributesInterface } from './custom-element';
+import { CustomElement } from './custom-element';
 
 /* eslint-disable no-unused-vars */
 export interface HandlerInterface {
     supports(
-        attributes: AttributesInterface,
-        config: ConfigInterface,
-        library: Library
+        element: CustomElement
     ): boolean,
     getIcon(
-        attributes: AttributesInterface,
-        config: ConfigInterface,
-        library: Library
+        element: CustomElement
     ): Promise<string>,
     getPriority(): number,
     setPriority(priority: number): void,
@@ -39,14 +33,12 @@ export class IconHandler {
      * @throws {Error}
      */
     public getIcon(
-        attributes: AttributesInterface,
-        config: ConfigInterface,
-        library: Library
+        element: CustomElement
     ): Promise<string> {
         let iconHandler: HandlerInterface|null = null;
 
         this.#handlerList.forEach((handler) => {
-            if (handler.supports(attributes, config, library) && iconHandler === null) {
+            if (handler.supports(element) && iconHandler === null) {
                 iconHandler = handler;
             }
         });
@@ -55,7 +47,7 @@ export class IconHandler {
             throw new Error('No handler found');
         }
 
-        return iconHandler.getIcon(attributes, config, library);
+        return iconHandler.getIcon(element);
     }
 
     public getHandlerList(): HandlerInterface[] {

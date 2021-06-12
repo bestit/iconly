@@ -1,6 +1,6 @@
 import { Library, LibraryTreeInterface } from './library';
 import { IconHandler } from './icon-handler';
-import { ATTRIBUTE_LOADING, ATTRIBUTE_LOADING_LAZY, AttributesInterface } from './custom-element';
+import { ATTRIBUTE_LOADING, ATTRIBUTE_LOADING_LAZY, CustomElement } from './custom-element';
 
 /* eslint-disable no-unused-vars, no-undef */
 export interface ConfigInterface {
@@ -10,7 +10,6 @@ export interface ConfigInterface {
     intersectionObserver?: IntersectionObserverInit,
     defaultNamespace?: string,
     defaultPack?: string,
-    handlerCallback?: Function,
 }
 /* eslint-enable no-unused-vars, no-undef */
 
@@ -56,8 +55,8 @@ export class ElementData {
         return this.#library;
     }
 
-    public getIcon(attributes: AttributesInterface): Promise<string> {
-        return this.#iconHandler.getIcon(attributes, this.#config, this.#library);
+    public getIcon(element: CustomElement): Promise<string> {
+        return this.#iconHandler.getIcon(element);
     }
 
     private createIntersectionObserver(): void {

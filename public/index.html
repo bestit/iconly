@@ -178,12 +178,20 @@
                 <test-icon symbol="check" flip="both"></test-icon>
             </section>
 
-            <section class="full-width">
+            <section>
                 <h2>Flip and rotate attribute</h2>
                 <p>Flip the icon horizontally, vertically or both</p>
                 <test-icon symbol="check" rotate="-30deg" flip="horizontal"></test-icon>
                 <test-icon symbol="check" rotate="90eg" flip="vertical"></test-icon>
                 <test-icon symbol="check" rotate="30deg" flip="both"></test-icon>
+            </section>
+
+            <section>
+                <h2>Inline content</h2>
+                <p>No fetching or replacing, just pre set content</p>
+                <test-icon symbol="check">
+                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" class="svg-inline--fa fa-check fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg>
+                </test-icon>
             </section>
 
             <section>
@@ -206,15 +214,6 @@
                 </test-icon>
             </section>
 
-            <section class="full-width">
-                <h2>Intersection Observer</h2>
-                <p>Delayed loading until element scrolls into viewport if <b>loading="lazy"</b> is set.</p>
-                <p>Scroll down to test.</p>
-                <div class="spacer"></div>
-                <p>Icon loading right about now.</p>
-                <test-icon symbol="loading" loading="lazy"></test-icon>
-            </section>
-
             <section>
                 <h2>Foo element</h2>
                 <p>New foo element with separate config and library</p>
@@ -225,6 +224,15 @@
                 <h2>Storyblok element</h2>
                 <p>New storyblok element with separate fetch pattern, mapped to storyblok cdn</p>
                 <storyblok-icon symbol="newsletter" pack="6b97693f9a" namespace="108717" loading="lazy"></storyblok-icon>
+            </section>
+
+            <section class="full-width">
+                <h2>Intersection Observer</h2>
+                <p>Delayed loading until element scrolls into viewport if <b>loading="lazy"</b> is set.</p>
+                <p>Scroll down to test.</p>
+                <div class="spacer"></div>
+                <p>Icon loading right about now.</p>
+                <test-icon symbol="loading" loading="lazy"></test-icon>
             </section>
         </div>
 

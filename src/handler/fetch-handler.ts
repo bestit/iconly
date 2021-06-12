@@ -1,14 +1,16 @@
 import { AbstractHandler } from './abstract-handler';
 import { ConfigInterface } from '../classes/element-data';
+import { AttributesInterface, CustomElement } from '../classes/custom-element';
 import { Library } from '../classes/library';
-import { AttributesInterface } from '../classes/custom-element';
 
 export class FetchHandler extends AbstractHandler {
     public supports(
-        attributes: AttributesInterface,
-        config: ConfigInterface,
-        library: Library
+        element: CustomElement
     ): boolean {
+        const config: ConfigInterface = element.getElementData().getConfig();
+        const library: Library = element.getElementData().getLibrary();
+        const attributes: AttributesInterface = element.getAttributes();
+
         if (config.fetchPattern === null) {
             return false;
         }
@@ -18,9 +20,11 @@ export class FetchHandler extends AbstractHandler {
     }
 
     public getIcon(
-        attributes: AttributesInterface,
-        config: ConfigInterface
+        element: CustomElement
     ): Promise<string> {
+        const config: ConfigInterface = element.getElementData().getConfig();
+        const attributes: AttributesInterface = element.getAttributes();
+
         return this.fetchSvg(FetchHandler.getUrl(attributes, config));
     }
 

@@ -1,10 +1,18 @@
 import { AbstractHandler } from './abstract-handler';
-import { AttributesInterface, ATTRIBUTE_NAMESPACE, ATTRIBUTE_PACK, ATTRIBUTE_SYMBOL } from '../classes/custom-element';
+import {
+    AttributesInterface,
+    ATTRIBUTE_NAMESPACE,
+    ATTRIBUTE_PACK,
+    ATTRIBUTE_SYMBOL,
+    CustomElement
+} from '../classes/custom-element';
 
 export class NullHandler extends AbstractHandler {
     public supports(
-        attributes: AttributesInterface,
+        element: CustomElement
     ): boolean {
+        const attributes: AttributesInterface = element.getAttributes();
+
         if (attributes[ATTRIBUTE_NAMESPACE] === null) {
             return true;
         }
@@ -20,8 +28,10 @@ export class NullHandler extends AbstractHandler {
      * @throws {Error}
      */
     public getIcon(
-        attributes: AttributesInterface,
+        element: CustomElement
     ): Promise<string> {
+        const attributes: AttributesInterface = element.getAttributes();
+
         return new Promise<string>((resolve, reject) => {
             reject(new Error(`Can't find icon matching attributes: ${JSON.stringify(attributes)}`));
         });

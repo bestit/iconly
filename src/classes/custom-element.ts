@@ -1,7 +1,7 @@
 import { IconService } from '../index';
 import { ElementData } from './element-data';
 
-const ENCODE_SVG_SYMBOLS = /[\r\n%#()<>?[\\\]^`{|}]/g;
+const ENCODE_SVG_SYMBOLS: RegExp = /[\r\n%#()<>?[\\\]^`{|}]/g;
 
 export const ATTRIBUTE_SYMBOL = 'symbol';
 export const ATTRIBUTE_PACK = 'pack';
@@ -12,6 +12,7 @@ export const ATTRIBUTE_FLIP = 'flip';
 
 export const ATTRIBUTE_MODE = 'mode';
 export const ATTRIBUTE_MODE_INLINE = 'inline';
+export const ATTRIBUTE_MODE_REPLACE = 'replace';
 export const ATTRIBUTE_MODE_WRAP = 'wrap';
 
 export const ATTRIBUTE_LOADING = 'loading';
@@ -125,7 +126,11 @@ export class CustomElement extends HTMLElement {
         this.getIcon();
     }
 
-    private getAttributes(): AttributesInterface {
+    public getElementData(): ElementData {
+        return this.#elementData;
+    }
+
+    public getAttributes(): AttributesInterface {
         const attributes = this.#attributes;
         const config = this.#elementData.getConfig();
 
@@ -137,8 +142,10 @@ export class CustomElement extends HTMLElement {
             attributes[ATTRIBUTE_PACK] = config.defaultPack;
         }
 
-        if (attributes[ATTRIBUTE_MODE] !== ATTRIBUTE_MODE_WRAP) {
-            attributes[ATTRIBUTE_MODE] = ATTRIBUTE_MODE_INLINE;
+        if (attributes[ATTRIBUTE_MODE] !== ATTRIBUTE_MODE_WRAP &&
+            attributes[ATTRIBUTE_MODE] !== ATTRIBUTE_MODE_INLINE
+        ) {
+            attributes[ATTRIBUTE_MODE] = ATTRIBUTE_MODE_REPLACE;
         }
 
         if (attributes[ATTRIBUTE_LOADING] !== ATTRIBUTE_LOADING_LAZY) {
@@ -149,8 +156,12 @@ export class CustomElement extends HTMLElement {
     }
 
     private getIcon(): void {
+        if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_INLINE) {
+            return;
+        }
+
         this.#elementData
-            .getIcon(this.getAttributes())
+            .getIcon(this)
             .then(data => {
                 this.iconLoadedSuccess(data);
             }).catch((error) => {
@@ -161,7 +172,7 @@ export class CustomElement extends HTMLElement {
     private iconLoadedSuccess(data: string): void {
         this.classList.remove('has--error');
 
-        if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_INLINE) {
+        if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_REPLACE) {
             this.innerHTML = data;
         }
 

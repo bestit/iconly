@@ -1,7 +1,6 @@
 import { HandlerInterface } from '../classes/icon-handler';
 import { ConfigInterface } from '../classes/element-data';
-import { Library } from '../classes/library';
-import { AttributesInterface } from '../classes/custom-element';
+import { CustomElement } from '../classes/custom-element';
 
 /* eslint-disable no-unused-vars */
 export abstract class AbstractHandler implements HandlerInterface {
@@ -12,15 +11,11 @@ export abstract class AbstractHandler implements HandlerInterface {
     }
 
     public abstract supports(
-        attributes: AttributesInterface,
-        config: ConfigInterface,
-        library: Library
+        element: CustomElement
     ): boolean
 
     public abstract getIcon(
-        attributes: AttributesInterface,
-        config: ConfigInterface,
-        library: Library
+        element: CustomElement
     ): Promise<string>
 
     public getPriority(): number {
