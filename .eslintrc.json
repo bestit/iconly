@@ -11,8 +11,6 @@
     "class-methods-use-this": "off"
   },
   "ignorePatterns": [
-    "lib/**",
-    "lib-esm/**",
-    "_bundles/**"
+    "dist/**"
   ]
 }
