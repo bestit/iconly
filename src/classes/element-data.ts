@@ -4,7 +4,6 @@ import { ATTRIBUTE_LOADING, ATTRIBUTE_LOADING_LAZY, CustomElement } from './cust
 
 /* eslint-disable no-unused-vars, no-undef */
 export interface ConfigInterface {
-    elementName?: string,
     fetchPattern?: string,
     urlTestPattern?: RegExp,
     intersectionObserver?: IntersectionObserverInit,
@@ -45,6 +44,15 @@ export class ElementData {
 
     public getConfig(): ConfigInterface {
         return this.config;
+    }
+
+    public setConfig(config: ConfigInterface): this {
+        this.config = {
+            ...defaultConfig,
+            ...config
+        };
+
+        return this;
     }
 
     public getIconHander(): IconHandler {

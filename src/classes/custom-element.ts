@@ -1,4 +1,4 @@
-import { IconService } from '../index';
+import { Iconly } from '../index';
 import { ElementData } from './element-data';
 
 const ENCODE_SVG_SYMBOLS: RegExp = /[\r\n%#()<>?[\\\]^`{|}]/g;
@@ -59,7 +59,7 @@ export class CustomElement extends HTMLElement {
         super();
 
         this.elementName = this.tagName.toLowerCase();
-        this.elementData = IconService.getElement(this.elementName);
+        this.elementData = Iconly.getElement(this.elementName);
 
         this.elementAttributes[ATTRIBUTE_MODE] = this.getAttribute(ATTRIBUTE_MODE);
         this.elementAttributes[ATTRIBUTE_LOADING] = this.getAttribute(ATTRIBUTE_LOADING);

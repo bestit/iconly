@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <title>Icon Element</title>
+        <title>Iconly</title>
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
         <!--suppress CssUnresolvedCustomProperty -->
@@ -138,7 +138,7 @@
         </style>
     </head>
     <body>
-        <h1>Icon Element examples</h1>
+        <h1>Iconly usage examples</h1>
 
         <div class="grid">
             <section>
@@ -226,8 +226,9 @@
 
             <section>
                 <h2>Storyblok element</h2>
-                <p>New storyblok element with separate fetch pattern, mapped to storyblok cdn</p>
-                <storyblok-icon symbol="newsletter" pack="6b97693f9a" namespace="108717"></storyblok-icon>
+                <p>Storyblok element with separate fetch pattern, mapped to storyblok cdn.</p>
+                <p>Use this storyblok asset pattern, to fill in the attributes: <i>/f/%NAMESPACE%/x/%PACK%/%SYMBOL%.svg</i></p>
+                <storyblok-icon symbol="" pack="" namespace=""></storyblok-icon>
             </section>
 
             <section class="full-width">
@@ -251,7 +252,10 @@
         <script src="/icon-element.js"></script>
         <script type="text/javascript">
             // Create a custom icon element with the desired name
-            IconElement.IconService.createElement(
+
+            
+
+            Iconly.createElement(
                 'test-icon',
                 {
                     fetchPattern: '/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
@@ -266,8 +270,10 @@
                 }
             );
 
+            Iconly.getElement('test-icon').getIconHandler().addHandler()
+
             // Foo element
-            IconElement.IconService.createElement(
+            Iconly.createElement(
                 'foo-icon',
                 {
                     fetchPattern: '/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
@@ -281,7 +287,7 @@
             );
 
             // Storyblok element
-            IconElement.IconService.createElement(
+            Iconly.createElement(
                 'storyblok-icon',
                 {
                     // See: https://github.com/storyblok/storyblok/issues/380

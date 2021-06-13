@@ -17,8 +17,6 @@ const baseConfig = {
     output: {
         filename: '[name].js',
         libraryTarget: 'umd',
-        library: 'IconElement',
-        umdNamedDefine: true,
         publicPath: '/',
     },
     resolve: {

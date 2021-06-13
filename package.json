@@ -1,5 +1,5 @@
 {
-    "name": "icon-element",
+    "name": "iconly",
     "version": "1.0.0",
     "description": "SVG icon system utilising a custom element",
     "repository": "git@github.com:s5nw/svg-icon-system.git",

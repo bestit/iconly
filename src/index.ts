@@ -3,7 +3,7 @@ import { CustomElement } from './classes/custom-element';
 import { ElementData, ConfigInterface } from './classes/element-data';
 import { LibraryTreeInterface } from './classes/library';
 
-export class IconService {
+export class Iconly {
     private static elements: ElementData[] = [];
 
     public static createElement(
@@ -11,7 +11,7 @@ export class IconService {
         config: ConfigInterface = {},
         libraryTree: LibraryTreeInterface = {}
     ): void {
-        IconService.elements[element] = new ElementData(element, config, libraryTree);
+        Iconly.elements[element] = new ElementData(element, config, libraryTree);
 
         /**
          * Define new element and use anonymous class extended from CustomElement,
@@ -21,7 +21,7 @@ export class IconService {
     }
 
     public static getElement(element: string): ElementData {
-        return IconService.elements[element];
+        return Iconly.elements[element];
     }
 }
 /* eslint-enable max-classes-per-file */
