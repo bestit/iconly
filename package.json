@@ -2,8 +2,21 @@
     "name": "iconly",
     "version": "1.0.0",
     "description": "SVG icon system utilising a custom element",
-    "repository": "git@github.com:s5nw/svg-icon-system.git",
-    "author": "Stephan Weber <steve-weber@web.de>",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bestit/iconly.git"
+    },
+    "author": "best it AG <info@bestit.de>",
+    "contributors": [
+        {
+            "name": "best it AG",
+            "email": "info@bestit.de"
+        },
+        {
+            "name": "Stephan Weber",
+            "email": "steve-weber@web.de"
+        }
+    ],
     "license": "MIT",
     "private": true,
     "main": "./dist/commonjs/index.js",
