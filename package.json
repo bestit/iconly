@@ -1,5 +1,5 @@
 {
-    "name": "iconly",
+    "name": "@best-it/iconly",
     "version": "1.0.0",
     "description": "SVG icon system utilising a custom element",
     "repository": {
