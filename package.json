@@ -1,6 +1,6 @@
 {
     "name": "@best-it/iconly",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "SVG icon system utilising a custom element",
     "repository": {
         "type": "git",

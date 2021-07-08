@@ -55,7 +55,7 @@ export class ElementData {
         return this;
     }
 
-    public getIconHander(): IconHandler {
+    public getIconHandler(): IconHandler {
         return this.iconHandler;
     }
 

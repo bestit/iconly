@@ -198,7 +198,7 @@ Get handler list:
 ```javascript
 Iconly
     .getElement('test-icon')
-    .getIconHander()
+    .getIconHandler()
     .getHandlerList();
 ```
 
@@ -207,7 +207,7 @@ You can reorder them by changing their priorities:
 ```javascript
 Iconly
     .getElement('test-icon')
-    .getIconHander()
+    .getIconHandlr()
     // Index starts with 0 for NullHandler
     .getHandler(0)
     .setPriority(99);
@@ -215,7 +215,7 @@ Iconly
 // Reorder handler list based on new priorities
 Iconly
     .getElement('test-icon')
-    .getIconHander()
+    .getIconHandler()
     .order();
 ```
 
@@ -236,17 +236,17 @@ class CustomHandler extends AbstractHandler {
 // Adding
 Iconly
     .getElement('test-icon')
-    .getIconHander()
+    .getIconHandler()
     .addHandler(new CustomHandler());
 
 // Removing
 Iconly
     .getElement('test-icon')
-    .getIconHander()
+    .getIconHandler()
     .removeHandler(INDEX);
 
 // replacing the complete handler list
-Iconly.getElement('test-icon').getIconHander().setHandlerList([
+Iconly.getElement('test-icon').getIconHandler().setHandlerList([
     new CustomHandler(),
 ])
 ```
