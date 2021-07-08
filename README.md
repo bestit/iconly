@@ -4,12 +4,12 @@ Iconly is a tool to create custom html elements that handle your SVG icons/image
 ## Installion
 npm:
 ```bash
-npm install iconly
+npm install @best-it/iconly
 ```
 
 yarn:
 ```bash
-yarn add iconly
+yarn add @best-it/iconly
 ```
 
 ## Usage
