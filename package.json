@@ -1,6 +1,6 @@
 {
     "name": "@best-it/iconly",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "SVG icon system utilising a custom element",
     "repository": {
         "type": "git",
@@ -28,7 +28,8 @@
         "default": "./dist/commonjs/index.js"
     },
     "files": [
-        "dist"
+        "dist",
+        "src"
     ],
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^4.2.0",

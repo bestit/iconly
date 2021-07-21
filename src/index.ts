@@ -9,7 +9,8 @@ export class Iconly {
     public static createElement(
         element: string,
         config: ConfigInterface = {},
-        libraryTree: LibraryTreeInterface = {}
+        libraryTree: LibraryTreeInterface = {},
+        defineCustomElement: boolean = true
     ): void {
         Iconly.elements[element] = new ElementData(element, config, libraryTree);
 
@@ -17,7 +18,9 @@ export class Iconly {
          * Define new element and use anonymous class extended from CustomElement,
          * this allows multiple definitions with the "same" class
          */
-        window.customElements.define(element, class extends CustomElement {});
+        if (defineCustomElement) {
+            window.customElements.define(element, class extends CustomElement {});
+        }
     }
 
     public static getElement(element: string): ElementData {
