@@ -1,11 +1,13 @@
 import { Iconly } from '../index';
-import { ElementData } from './element-data';
+import { ConfigInterface, ElementData, defaultConfig } from './element-data';
+import { LibraryTreeInterface } from './library';
 
 const ENCODE_SVG_SYMBOLS: RegExp = /[\r\n%#()<>?[\\\]^`{|}]/g;
 
 export const ATTRIBUTE_SYMBOL = 'symbol';
 export const ATTRIBUTE_PACK = 'pack';
 export const ATTRIBUTE_NAMESPACE = 'namespace';
+export const ATTRIBUTE_FETCH_PATTERN = 'fetchPattern';
 
 export const ATTRIBUTE_ROTATE = 'rotate';
 export const ATTRIBUTE_FLIP = 'flip';
@@ -14,6 +16,8 @@ export const ATTRIBUTE_MODE = 'mode';
 export const ATTRIBUTE_MODE_INLINE = 'inline';
 export const ATTRIBUTE_MODE_REPLACE = 'replace';
 export const ATTRIBUTE_MODE_WRAP = 'wrap';
+export const ATTRIBUTE_MODE_PREPEND = 'prepend';
+export const ATTRIBUTE_MODE_APPEND = 'append';
 
 export const ATTRIBUTE_LOADING = 'loading';
 export const ATTRIBUTE_LOADING_LAZY = 'lazy';
@@ -23,6 +27,7 @@ export interface AttributesInterface extends Object {
     [ATTRIBUTE_SYMBOL]: string|null,
     [ATTRIBUTE_PACK]: string|null,
     [ATTRIBUTE_NAMESPACE]: string|null,
+    [ATTRIBUTE_FETCH_PATTERN]: string|null,
 
     [ATTRIBUTE_ROTATE]: string|null,
     [ATTRIBUTE_FLIP]: string|null,
@@ -34,13 +39,14 @@ export interface AttributesInterface extends Object {
 export class CustomElement extends HTMLElement {
     // Custom element tag name
     private elementName: string;
-    private elementData: ElementData;
+    protected elementData: ElementData;
 
     // Attributes
     private elementAttributes: AttributesInterface = {
         [ATTRIBUTE_SYMBOL]: null,
         [ATTRIBUTE_PACK]: null,
         [ATTRIBUTE_NAMESPACE]: null,
+        [ATTRIBUTE_FETCH_PATTERN]: null,
 
         [ATTRIBUTE_ROTATE]: null,
         [ATTRIBUTE_FLIP]: null,
@@ -59,12 +65,26 @@ export class CustomElement extends HTMLElement {
         super();
 
         this.elementName = this.tagName.toLowerCase();
-        this.elementData = Iconly.getElement(this.elementName);
 
         this.elementAttributes[ATTRIBUTE_MODE] = this.getAttribute(ATTRIBUTE_MODE);
         this.elementAttributes[ATTRIBUTE_LOADING] = this.getAttribute(ATTRIBUTE_LOADING);
 
         this.registerEvents();
+
+        if (typeof Iconly.getElement(this.elementName) !== 'undefined') {
+            this.elementData = Iconly.getElement(this.elementName);
+        }
+    }
+
+    public initializeCustomElement(
+        element: string,
+        config: ConfigInterface = {},
+        libraryTree: LibraryTreeInterface = {},
+        defineCustomElement: boolean = true
+    ): void {
+        Iconly.createElement(element, config, libraryTree, defineCustomElement);
+
+        this.elementData = Iconly.getElement(element);
     }
 
     private registerEvents(): void {
@@ -77,8 +97,10 @@ export class CustomElement extends HTMLElement {
             ATTRIBUTE_SYMBOL,
             ATTRIBUTE_PACK,
             ATTRIBUTE_NAMESPACE,
+            ATTRIBUTE_FETCH_PATTERN,
             ATTRIBUTE_ROTATE,
-            ATTRIBUTE_FLIP
+            ATTRIBUTE_FLIP,
+            ATTRIBUTE_LOADING
         ];
     }
 
@@ -89,7 +111,7 @@ export class CustomElement extends HTMLElement {
 
         this.elementAttributes[name] = newValue;
 
-        if ([ATTRIBUTE_SYMBOL, ATTRIBUTE_PACK, ATTRIBUTE_NAMESPACE].includes(name)) {
+        if ([ATTRIBUTE_SYMBOL, ATTRIBUTE_PACK, ATTRIBUTE_NAMESPACE, ATTRIBUTE_LOADING].includes(name)) {
             if (this.getAttributes()[ATTRIBUTE_LOADING] === ATTRIBUTE_LOADING_EAGER || this.isIntersected) {
                 this.onIconChange();
             }
@@ -132,7 +154,7 @@ export class CustomElement extends HTMLElement {
 
     public getAttributes(): AttributesInterface {
         const attributes = this.elementAttributes;
-        const config = this.elementData.getConfig();
+        const config = typeof this.elementData !== 'undefined' ? this.elementData.getConfig() : defaultConfig;
 
         if (attributes[ATTRIBUTE_NAMESPACE] === null) {
             attributes[ATTRIBUTE_NAMESPACE] = config.defaultNamespace;
@@ -142,8 +164,14 @@ export class CustomElement extends HTMLElement {
             attributes[ATTRIBUTE_PACK] = config.defaultPack;
         }
 
+        if (attributes[ATTRIBUTE_FETCH_PATTERN] === null) {
+            attributes[ATTRIBUTE_FETCH_PATTERN] = config.defaultFetchPattern;
+        }
+
         if (attributes[ATTRIBUTE_MODE] !== ATTRIBUTE_MODE_WRAP &&
-            attributes[ATTRIBUTE_MODE] !== ATTRIBUTE_MODE_INLINE
+            attributes[ATTRIBUTE_MODE] !== ATTRIBUTE_MODE_INLINE &&
+            attributes[ATTRIBUTE_MODE] !== ATTRIBUTE_MODE_PREPEND &&
+            attributes[ATTRIBUTE_MODE] !== ATTRIBUTE_MODE_APPEND
         ) {
             attributes[ATTRIBUTE_MODE] = ATTRIBUTE_MODE_REPLACE;
         }
@@ -156,7 +184,7 @@ export class CustomElement extends HTMLElement {
     }
 
     private getIcon(): void {
-        if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_INLINE) {
+        if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_INLINE || typeof this.elementData === 'undefined') {
             return;
         }
 
@@ -174,6 +202,18 @@ export class CustomElement extends HTMLElement {
 
         if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_REPLACE) {
             this.innerHTML = data;
+        }
+
+        if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_PREPEND) {
+            if (this.innerHTML.indexOf(data) === -1) {
+                this.innerHTML = data + this.innerHTML;
+            }
+        }
+
+        if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_APPEND) {
+            if (this.innerHTML.indexOf(data) === -1) {
+                this.innerHTML = this.innerHTML + data;
+            }
         }
 
         if (this.getAttributes()[ATTRIBUTE_MODE] === ATTRIBUTE_MODE_WRAP) {

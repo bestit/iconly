@@ -1,6 +1,6 @@
 {
     "name": "@best-it/iconly",
-    "version": "1.0.5",
+    "version": "1.0.6-beta.3",
     "description": "SVG icon system utilising a custom element",
     "repository": {
         "type": "git",
@@ -52,7 +52,10 @@
         "build:commonjs": "tsc --module commonjs --target es5 --outDir dist/es5/commonjs && tsc --module commonjs --target es6 --outDir dist/commonjs",
         "build:umd": "webpack --mode=production --config-name es5 && webpack --mode=production --config-name es6",
         "serve:es5": "webpack serve --config-name es5 --mode=development",
-        "serve:es6": "webpack serve --config-name es6 --mode=development"
+        "serve:es6": "webpack serve --config-name es6 --mode=development",
+        "eslint": "npx eslint ./src/**/*.ts",
+        "publish": "npm publish --access public",
+        "publish:beta": "npm publish --access public --tag beta"
     },
     "dependencies": {}
 }
