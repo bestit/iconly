@@ -1,6 +1,6 @@
 {
     "name": "@best-it/iconly",
-    "version": "1.0.6-beta.3",
+    "version": "1.0.6-beta.5",
     "description": "SVG icon system utilising a custom element",
     "repository": {
         "type": "git",
@@ -23,7 +23,10 @@
     "type": "module",
     "types": "./dist/types/index.d.ts",
     "exports": {
-        "import": "./dist/esm/index.js",
+        "import": {
+            ".": "./dist/esm/index.js",
+            "./src/classes/custom-element": "./src/classes/custom-element.ts"
+        },
         "require": "./dist/commonjs/index.js",
         "default": "./dist/commonjs/index.js"
     },
