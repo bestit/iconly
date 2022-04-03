@@ -92,6 +92,20 @@ export class CustomElement extends HTMLElement {
         this.addEventListener(`${this.elementName}-reload`, this.onReload);
     }
 
+    private connectedCallback() {
+        if (this.elementData.getIntersectionObserver() !== null &&
+            this.getAttribute(ATTRIBUTE_LOADING) === ATTRIBUTE_LOADING_LAZY
+        ) {
+            this.elementData.getIntersectionObserver().observe(this);
+        }
+    }
+
+    private disconnectedCallback() {
+        if (this.elementData.getIntersectionObserver() !== null) {
+            this.elementData.getIntersectionObserver().unobserve(this);
+        }
+    }
+
     static get observedAttributes(): string[] {
         return [
             ATTRIBUTE_SYMBOL,
@@ -114,6 +128,18 @@ export class CustomElement extends HTMLElement {
         if ([ATTRIBUTE_SYMBOL, ATTRIBUTE_PACK, ATTRIBUTE_NAMESPACE, ATTRIBUTE_LOADING].includes(name)) {
             if (this.getAttributes()[ATTRIBUTE_LOADING] === ATTRIBUTE_LOADING_EAGER || this.isIntersected) {
                 this.onIconChange();
+            }
+        }
+
+        if (name === ATTRIBUTE_LOADING && newValue === ATTRIBUTE_LOADING_LAZY) {
+            if (this.elementData.getIntersectionObserver() !== null) {
+                this.elementData.getIntersectionObserver().observe(this);
+            }
+        }
+
+        if (name === ATTRIBUTE_LOADING && newValue === ATTRIBUTE_LOADING_EAGER) {
+            if (this.elementData.getIntersectionObserver() !== null) {
+                this.elementData.getIntersectionObserver().unobserve(this);
             }
         }
 

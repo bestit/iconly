@@ -1,7 +1,6 @@
 import { Library, LibraryTreeInterface } from './library';
 import { IconHandler } from './icon-handler';
 import { CustomElement } from './custom-element';
-import { Iconly } from '../index';
 
 /* eslint-disable no-unused-vars, no-undef */
 export interface ConfigInterface {
@@ -30,6 +29,7 @@ export class ElementData {
     private config: ConfigInterface;
     private library: Library;
     private iconHandler: IconHandler;
+    private intersectionObserver: IntersectionObserver | null;
 
     constructor(
         element: string,
@@ -43,6 +43,7 @@ export class ElementData {
         };
         this.library = new Library(libraryTree);
         this.iconHandler = new IconHandler();
+        this.intersectionObserver = null;
 
         if (typeof this.config.createIntersectionObserver !== 'undefined' &&
             this.config.createIntersectionObserver !== null &&
@@ -77,7 +78,32 @@ export class ElementData {
         return this.iconHandler.getIcon(element);
     }
 
-    private createIntersectionObserver(): void {
-        Iconly.registerIntersectionObserver(this.element, this.config);
+    public getIntersectionObserver(): IntersectionObserver {
+        return this.intersectionObserver;
+    }
+
+    public setIntersectionObserver(intersectionObserver: IntersectionObserver | null) {
+        this.intersectionObserver = intersectionObserver;
+    }
+
+    public createIntersectionObserver(): void {
+        if ('IntersectionObserver' in window) {
+            this.intersectionObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const customElement = entry.target;
+
+                        customElement.dispatchEvent(new CustomEvent(
+                            `${this.element}-intersection`,
+                            {
+                                bubbles: true,
+                            }
+                        ));
+
+                        observer.unobserve(customElement);
+                    }
+                });
+            }, this.getConfig().intersectionObserver);
+        }
     }
 }

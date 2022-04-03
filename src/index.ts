@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { ATTRIBUTE_LOADING, ATTRIBUTE_LOADING_LAZY, CustomElement } from './classes/custom-element';
+import { CustomElement } from './classes/custom-element';
 import { ElementData, ConfigInterface } from './classes/element-data';
 import { LibraryTreeInterface } from './classes/library';
 
@@ -25,35 +25,6 @@ export class Iconly {
 
     public static getElement(element: string): ElementData {
         return Iconly.elements[element];
-    }
-
-    public static registerIntersectionObserver(element: string, config: ConfigInterface = {}): void {
-        if ('IntersectionObserver' in window) {
-            const customElements = Array.from(
-                document.querySelectorAll(
-                    `${element}[${ATTRIBUTE_LOADING}="${ATTRIBUTE_LOADING_LAZY}"]`
-                )
-            );
-
-            const customElementObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const customElement = entry.target;
-
-                        customElement.dispatchEvent(new CustomEvent(
-                            `${element}-intersection`,
-                            {
-                                bubbles: true,
-                            }
-                        ));
-
-                        observer.unobserve(customElement);
-                    }
-                });
-            }, config.intersectionObserver);
-
-            customElements.forEach(customElement => customElementObserver.observe(customElement));
-        }
     }
 }
 /* eslint-enable max-classes-per-file */
