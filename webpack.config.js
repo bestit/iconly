@@ -32,11 +32,17 @@ const baseConfig = {
         ],
     },
     devServer: {
-        contentBase: [
-            _resolve('./public'),
-            _resolve('./node_modules')
+        static: [
+            {
+                directory: _resolve('./public'),
+            },
+            {
+                directory: _resolve('./node_modules')
+            },
         ],
-        publicPath: '/',
+        devMiddleware: {
+            publicPath: '/',
+        }
     },
 };
 

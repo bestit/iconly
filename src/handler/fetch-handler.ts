@@ -31,10 +31,12 @@ export class FetchHandler extends AbstractHandler {
     private static getUrl(attributes: AttributesInterface, config: ConfigInterface): string {
         let url = config.fetchPattern;
 
-        url = url.replace('%NAMESPACE%', attributes.namespace);
-        url = url.replace('%PACK%', attributes.pack);
-        url = url.replace('%SYMBOL%', attributes.symbol);
+        if (typeof url !== 'undefined') {
+            url = url.replace('%NAMESPACE%', attributes.namespace);
+            url = url.replace('%PACK%', attributes.pack);
+            url = url.replace('%SYMBOL%', attributes.symbol);
+        }
 
-        return url;
+        return url || '';
     }
 }

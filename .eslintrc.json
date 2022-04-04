@@ -8,7 +8,8 @@
     "eslint-config-bestit-base"
   ],
   "rules": {
-    "class-methods-use-this": "off"
+    "class-methods-use-this": "off",
+    "max-params": ["error", { "max": 4 }]
   },
   "ignorePatterns": [
     "dist/**"

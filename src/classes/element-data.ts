@@ -1,6 +1,6 @@
 import { Library, LibraryTreeInterface } from './library';
 import { IconHandler } from './icon-handler';
-import { ATTRIBUTE_LOADING, ATTRIBUTE_LOADING_LAZY, CustomElement } from './custom-element';
+import { CustomElement } from './custom-element';
 
 /* eslint-disable no-unused-vars, no-undef */
 export interface ConfigInterface {
@@ -9,15 +9,19 @@ export interface ConfigInterface {
     intersectionObserver?: IntersectionObserverInit,
     defaultNamespace?: string,
     defaultPack?: string,
+    defaultFetchPattern?: string,
+    createIntersectionObserver?: boolean
 }
 /* eslint-enable no-unused-vars, no-undef */
 
-const defaultConfig: ConfigInterface = {
+export const defaultConfig: ConfigInterface = {
     defaultNamespace: 'storefront',
     defaultPack: 'default',
+    defaultFetchPattern: null,
     urlTestPattern:
         /^(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._+~#=/]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
     intersectionObserver: {},
+    createIntersectionObserver: true,
 };
 
 export class ElementData {
@@ -25,6 +29,7 @@ export class ElementData {
     private config: ConfigInterface;
     private library: Library;
     private iconHandler: IconHandler;
+    private intersectionObserver: IntersectionObserver | null;
 
     constructor(
         element: string,
@@ -38,8 +43,14 @@ export class ElementData {
         };
         this.library = new Library(libraryTree);
         this.iconHandler = new IconHandler();
+        this.intersectionObserver = null;
 
-        this.createIntersectionObserver();
+        if (typeof this.config.createIntersectionObserver !== 'undefined' &&
+            this.config.createIntersectionObserver !== null &&
+            this.config.createIntersectionObserver
+        ) {
+            this.createIntersectionObserver();
+        }
     }
 
     public getConfig(): ConfigInterface {
@@ -67,15 +78,17 @@ export class ElementData {
         return this.iconHandler.getIcon(element);
     }
 
-    private createIntersectionObserver(): void {
-        if ('IntersectionObserver' in window) {
-            const customElements = Array.from(
-                document.querySelectorAll(
-                    `${this.element}[${ATTRIBUTE_LOADING}="${ATTRIBUTE_LOADING_LAZY}"]`
-                )
-            );
+    public getIntersectionObserver(): IntersectionObserver {
+        return this.intersectionObserver;
+    }
 
-            const customElementObserver = new IntersectionObserver((entries, observer) => {
+    public setIntersectionObserver(intersectionObserver: IntersectionObserver | null) {
+        this.intersectionObserver = intersectionObserver;
+    }
+
+    public createIntersectionObserver(): void {
+        if ('IntersectionObserver' in window) {
+            this.intersectionObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const customElement = entry.target;
@@ -91,8 +104,6 @@ export class ElementData {
                     }
                 });
             }, this.getConfig().intersectionObserver);
-
-            customElements.forEach(customElement => customElementObserver.observe(customElement));
         }
     }
 }
