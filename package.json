@@ -1,15 +1,15 @@
 {
     "name": "@best-it/iconly",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "SVG icon system utilising a custom element",
     "repository": {
         "type": "git",
         "url": "https://github.com/bestit/iconly.git"
     },
-    "author": "best it AG <info@bestit.de>",
+    "author": "best it GmbH <info@bestit.de>",
     "contributors": [
         {
-            "name": "best it AG",
+            "name": "best it GmbH",
             "email": "info@bestit.de"
         },
         {
@@ -23,12 +23,13 @@
     "type": "module",
     "types": "./dist/types/index.d.ts",
     "exports": {
-        "import": {
-            ".": "./dist/esm/index.js",
-            "./src/classes/custom-element": "./src/classes/custom-element.ts"
+        ".": {
+            "types": "./dist/types/index.d.ts",
+            "import": "./dist/esm/index.js",
+            "require": "./dist/commonjs/index.js"
         },
-        "require": "./dist/commonjs/index.js",
-        "default": "./dist/commonjs/index.js"
+        "./src": "./src/index.ts",
+        "./src/*": "./src/*"
     },
     "files": [
         "dist",
