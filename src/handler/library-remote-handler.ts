@@ -1,7 +1,7 @@
-import { AbstractHandler } from './abstract-handler';
-import { ConfigInterface } from '../classes/element-data';
-import { Library } from '../classes/library';
-import { AttributesInterface, CustomElement } from '../classes/custom-element';
+import { AbstractHandler } from './abstract-handler.js';
+import { type ConfigInterface } from '../classes/element-data.js';
+import { Library } from '../classes/library.js';
+import { type AttributesInterface, CustomElement } from '../classes/custom-element.js';
 
 export class LibraryRemoteHandler extends AbstractHandler {
     public supports(
@@ -25,7 +25,14 @@ export class LibraryRemoteHandler extends AbstractHandler {
     ): Promise<string> {
         const library: Library = element.getElementData().getLibrary();
         const attributes: AttributesInterface = element.getAttributes();
+        const value = library.getValue(attributes);
 
-        return this.fetchSvg(library.getValue(attributes));
+        if (value === null) {
+            return new Promise<string>((resolve, reject) => {
+                reject(new Error(`Can't find icon matching attributes: ${JSON.stringify(attributes)}`));
+            });
+        }
+
+        return this.fetchSvg(value);
     }
 }

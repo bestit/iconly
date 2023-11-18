@@ -1,16 +1,18 @@
 {
     "compilerOptions": {
-        "moduleResolution": "node",
-        "module": "es6",
-        "target": "es6",
+        "moduleResolution": "node16",
+        "module": "node16",
+        "target": "es2016",
         "lib": [
-            "es6",
+            "es2016",
             "dom"
         ],
         "outDir": "dist",
         "forceConsistentCasingInFileNames": true,
         "sourceMap": true,
         "declaration": false,
+        "verbatimModuleSyntax": true,
+        "strict": true
     },
     "files": [
         "./src/index.ts"

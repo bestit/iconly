@@ -1,11 +1,11 @@
-import { AbstractHandler } from './abstract-handler';
+import { AbstractHandler } from './abstract-handler.js';
 import {
-    AttributesInterface,
+    type AttributesInterface,
     ATTRIBUTE_NAMESPACE,
     ATTRIBUTE_PACK,
     ATTRIBUTE_SYMBOL,
     CustomElement
-} from '../classes/custom-element';
+} from '../classes/custom-element.js';
 
 export class NullHandler extends AbstractHandler {
     public supports(

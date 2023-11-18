@@ -1,6 +1,6 @@
-import { Iconly } from '../index';
-import { ConfigInterface, ElementData, defaultConfig } from './element-data';
-import { LibraryTreeInterface } from './library';
+import { Iconly } from '../index.js';
+import { type ConfigInterface, ElementData, defaultConfig } from './element-data.js';
+import { type LibraryTreeInterface } from './library.js';
 
 const ENCODE_SVG_SYMBOLS: RegExp = /[\r\n%#()<>?[\\\]^`{|}]/g;
 
@@ -23,17 +23,18 @@ export const ATTRIBUTE_LOADING = 'loading';
 export const ATTRIBUTE_LOADING_LAZY = 'lazy';
 export const ATTRIBUTE_LOADING_EAGER = 'eager';
 
-export interface AttributesInterface extends Object {
-    [ATTRIBUTE_SYMBOL]: string|null,
-    [ATTRIBUTE_PACK]: string|null,
-    [ATTRIBUTE_NAMESPACE]: string|null,
-    [ATTRIBUTE_FETCH_PATTERN]: string|null,
+export interface AttributesInterface {
+    [ATTRIBUTE_SYMBOL]?: string;
+    [ATTRIBUTE_PACK]?: string;
+    [ATTRIBUTE_NAMESPACE]?: string;
+    [ATTRIBUTE_FETCH_PATTERN]?: string
 
-    [ATTRIBUTE_ROTATE]: string|null,
-    [ATTRIBUTE_FLIP]: string|null,
+    [ATTRIBUTE_ROTATE]?: string;
+    [ATTRIBUTE_FLIP]?: string;
 
-    [ATTRIBUTE_MODE]: string|null,
-    [ATTRIBUTE_LOADING]: string|null,
+    [ATTRIBUTE_MODE]?: string;
+    [ATTRIBUTE_LOADING]?: string;
+    [x: string]: unknown;
 }
 
 export class CustomElement extends HTMLElement {
@@ -43,36 +44,37 @@ export class CustomElement extends HTMLElement {
 
     // Attributes
     private elementAttributes: AttributesInterface = {
-        [ATTRIBUTE_SYMBOL]: null,
-        [ATTRIBUTE_PACK]: null,
-        [ATTRIBUTE_NAMESPACE]: null,
-        [ATTRIBUTE_FETCH_PATTERN]: null,
+        [ATTRIBUTE_SYMBOL]: undefined,
+        [ATTRIBUTE_PACK]: undefined,
+        [ATTRIBUTE_NAMESPACE]: undefined,
+        [ATTRIBUTE_FETCH_PATTERN]: undefined,
 
-        [ATTRIBUTE_ROTATE]: null,
-        [ATTRIBUTE_FLIP]: null,
+        [ATTRIBUTE_ROTATE]: undefined,
+        [ATTRIBUTE_FLIP]: undefined,
 
-        [ATTRIBUTE_MODE]: null,
-        [ATTRIBUTE_LOADING]: null,
+        [ATTRIBUTE_MODE]: undefined,
+        [ATTRIBUTE_LOADING]: undefined,
     };
 
     // Intersection observer state
     private isIntersected: boolean = false;
 
     // Timeout to prevent redundant attribtue callbacks with simultaneous attribute modifications
-    private attributeChangedTimeout = null;
+    private attributeChangedTimeout: number | null = null;
 
     constructor() {
         super();
 
         this.elementName = this.tagName.toLowerCase();
-
-        this.elementAttributes[ATTRIBUTE_MODE] = this.getAttribute(ATTRIBUTE_MODE);
-        this.elementAttributes[ATTRIBUTE_LOADING] = this.getAttribute(ATTRIBUTE_LOADING);
+        this.elementAttributes[ATTRIBUTE_MODE] = this.getAttribute(ATTRIBUTE_MODE) ?? undefined;
+        this.elementAttributes[ATTRIBUTE_LOADING] = this.getAttribute(ATTRIBUTE_LOADING) ?? undefined;
 
         this.registerEvents();
 
         if (typeof Iconly.getElement(this.elementName) !== 'undefined') {
             this.elementData = Iconly.getElement(this.elementName);
+        } else {
+            this.elementData = new ElementData(this.elementName);
         }
     }
 
@@ -96,13 +98,13 @@ export class CustomElement extends HTMLElement {
         if (this.elementData.getIntersectionObserver() !== null &&
             this.getAttribute(ATTRIBUTE_LOADING) === ATTRIBUTE_LOADING_LAZY
         ) {
-            this.elementData.getIntersectionObserver().observe(this);
+            this.elementData.getIntersectionObserver()?.observe(this);
         }
     }
 
     private disconnectedCallback() {
         if (this.elementData.getIntersectionObserver() !== null) {
-            this.elementData.getIntersectionObserver().unobserve(this);
+            this.elementData.getIntersectionObserver()?.unobserve(this);
         }
     }
 
@@ -133,13 +135,13 @@ export class CustomElement extends HTMLElement {
 
         if (name === ATTRIBUTE_LOADING && newValue === ATTRIBUTE_LOADING_LAZY) {
             if (this.elementData.getIntersectionObserver() !== null) {
-                this.elementData.getIntersectionObserver().observe(this);
+                this.elementData.getIntersectionObserver()?.observe(this);
             }
         }
 
         if (name === ATTRIBUTE_LOADING && newValue === ATTRIBUTE_LOADING_EAGER) {
             if (this.elementData.getIntersectionObserver() !== null) {
-                this.elementData.getIntersectionObserver().unobserve(this);
+                this.elementData.getIntersectionObserver()?.unobserve(this);
             }
         }
 

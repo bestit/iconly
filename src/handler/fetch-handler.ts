@@ -1,7 +1,7 @@
-import { AbstractHandler } from './abstract-handler';
-import { ConfigInterface } from '../classes/element-data';
-import { AttributesInterface, CustomElement } from '../classes/custom-element';
-import { Library } from '../classes/library';
+import { AbstractHandler } from './abstract-handler.js';
+import { type ConfigInterface } from '../classes/element-data.js';
+import { type AttributesInterface, CustomElement } from '../classes/custom-element.js';
+import { Library } from '../classes/library.js';
 
 export class FetchHandler extends AbstractHandler {
     public supports(
@@ -32,9 +32,9 @@ export class FetchHandler extends AbstractHandler {
         let url = config.fetchPattern;
 
         if (typeof url !== 'undefined') {
-            url = url.replace('%NAMESPACE%', attributes.namespace);
-            url = url.replace('%PACK%', attributes.pack);
-            url = url.replace('%SYMBOL%', attributes.symbol);
+            url = url.replace('%NAMESPACE%', attributes.namespace ?? '');
+            url = url.replace('%PACK%', attributes.pack ?? '');
+            url = url.replace('%SYMBOL%', attributes.symbol ?? '');
         }
 
         return url || '';

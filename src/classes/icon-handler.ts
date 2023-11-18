@@ -1,8 +1,8 @@
-import { FetchHandler } from '../handler/fetch-handler';
-import { LibraryRemoteHandler } from '../handler/library-remote-handler';
-import { LibraryInlineHandler } from '../handler/library-inline-handler';
-import { NullHandler } from '../handler/null-handler';
-import { CustomElement } from './custom-element';
+import { FetchHandler } from '../handler/fetch-handler.js';
+import { LibraryRemoteHandler } from '../handler/library-remote-handler.js';
+import { LibraryInlineHandler } from '../handler/library-inline-handler.js';
+import { NullHandler } from '../handler/null-handler.js';
+import { CustomElement } from './custom-element.js';
 
 /* eslint-disable no-unused-vars */
 export interface HandlerInterface {
@@ -35,15 +35,11 @@ export class IconHandler {
     public getIcon(
         element: CustomElement
     ): Promise<string> {
-        let iconHandler: HandlerInterface|null = null;
-
-        this.handlerList.forEach((handler) => {
-            if (handler.supports(element) && iconHandler === null) {
-                iconHandler = handler;
-            }
+        const iconHandler = this.handlerList.find((handler) => {
+            return handler.supports(element);
         });
 
-        if (iconHandler === null) {
+        if (typeof iconHandler === 'undefined') {
             throw new Error('No handler found');
         }
 

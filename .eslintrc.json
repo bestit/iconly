@@ -2,11 +2,10 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "@stylistic"
   ],
-  "extends": [
-    "eslint-config-bestit-base"
-  ],
+  "extends": [],
   "rules": {
     "class-methods-use-this": "off",
     "max-params": ["error", { "max": 4 }]

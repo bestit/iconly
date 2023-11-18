@@ -1,7 +1,7 @@
-import { AbstractHandler } from './abstract-handler';
-import { ConfigInterface } from '../classes/element-data';
-import { Library } from '../classes/library';
-import { AttributesInterface, CustomElement } from '../classes/custom-element';
+import { AbstractHandler } from './abstract-handler.js';
+import { type ConfigInterface } from '../classes/element-data.js';
+import { Library } from '../classes/library.js';
+import { type AttributesInterface, CustomElement } from '../classes/custom-element.js';
 
 export class LibraryInlineHandler extends AbstractHandler {
     public supports(
@@ -30,11 +30,14 @@ export class LibraryInlineHandler extends AbstractHandler {
         const attributes: AttributesInterface = element.getAttributes();
 
         return new Promise<string>((resolve, reject) => {
-            try {
-                resolve(library.getValue(attributes));
-            } catch (error) {
-                reject(error);
+            const value = library.getValue(attributes);
+
+            if (value === null) {
+                reject(new Error(`Can't find icon matching attributes: ${JSON.stringify(attributes)}`));
+                return
             }
+
+            resolve(value);
         });
     }
 }

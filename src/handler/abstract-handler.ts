@@ -1,6 +1,6 @@
-import { HandlerInterface } from '../classes/icon-handler';
-import { ConfigInterface } from '../classes/element-data';
-import { CustomElement } from '../classes/custom-element';
+import { type HandlerInterface } from '../classes/icon-handler.js';
+import { type ConfigInterface } from '../classes/element-data.js';
+import { CustomElement } from '../classes/custom-element.js';
 
 /* eslint-disable no-unused-vars */
 export abstract class AbstractHandler implements HandlerInterface {

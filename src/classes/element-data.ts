@@ -1,6 +1,6 @@
-import { Library, LibraryTreeInterface } from './library';
-import { IconHandler } from './icon-handler';
-import { CustomElement } from './custom-element';
+import { Library, type LibraryTreeInterface } from './library.js';
+import { IconHandler } from './icon-handler.js';
+import { CustomElement } from './custom-element.js';
 
 /* eslint-disable no-unused-vars, no-undef */
 export interface ConfigInterface {
@@ -17,7 +17,7 @@ export interface ConfigInterface {
 export const defaultConfig: ConfigInterface = {
     defaultNamespace: 'storefront',
     defaultPack: 'default',
-    defaultFetchPattern: null,
+    defaultFetchPattern: undefined,
     urlTestPattern:
         /^(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._+~#=/]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
     intersectionObserver: {},
@@ -78,7 +78,7 @@ export class ElementData {
         return this.iconHandler.getIcon(element);
     }
 
-    public getIntersectionObserver(): IntersectionObserver {
+    public getIntersectionObserver(): IntersectionObserver | null {
         return this.intersectionObserver;
     }
 

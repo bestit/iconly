@@ -1,10 +1,10 @@
 /* eslint-disable max-classes-per-file */
-import { CustomElement } from './classes/custom-element';
-import { ElementData, ConfigInterface } from './classes/element-data';
-import { LibraryTreeInterface } from './classes/library';
+import { CustomElement } from './classes/custom-element.js';
+import { ElementData, type ConfigInterface } from './classes/element-data.js';
+import { type LibraryTreeInterface } from './classes/library.js';
 
 export class Iconly {
-    private static elements: ElementData[] = [];
+    private static elements: { [key: string]: ElementData } = {};
 
     public static createElement(
         element: string,

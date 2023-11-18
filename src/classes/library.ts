@@ -1,11 +1,11 @@
-import { AttributesInterface, ATTRIBUTE_NAMESPACE, ATTRIBUTE_PACK, ATTRIBUTE_SYMBOL } from './custom-element';
+import { type AttributesInterface, ATTRIBUTE_NAMESPACE, ATTRIBUTE_PACK, ATTRIBUTE_SYMBOL } from './custom-element.js';
 
-export interface LibraryTreeInterface extends Object {
+export interface LibraryTreeInterface {
     [propName: string]: {
         [propName: string]: {
             [propName: string]: string
         }
-    }|string|Function
+    }
 }
 
 export class Library {
@@ -35,9 +35,9 @@ export class Library {
         this.mergeTree(
             this.libraryTree,
             {
-                [attributes[ATTRIBUTE_NAMESPACE]]: {
-                    [attributes[ATTRIBUTE_PACK]]: {
-                        [attributes[ATTRIBUTE_SYMBOL]]: value,
+                [attributes[ATTRIBUTE_NAMESPACE] as string]: {
+                    [attributes[ATTRIBUTE_PACK] as string]: {
+                        [attributes[ATTRIBUTE_SYMBOL] as string]: value,
                     }
                 }
             }
@@ -51,12 +51,12 @@ export class Library {
         }
 
         delete this.libraryTree[
-            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
+            attributes[ATTRIBUTE_NAMESPACE] as string][attributes[ATTRIBUTE_PACK] as string][attributes[ATTRIBUTE_SYMBOL] as string
         ];
         return this;
     }
 
-    public mergeTree(targetTree: Object, sourceTree: Object): this {
+    public mergeTree(targetTree: any, sourceTree: any): this {
         for (const key of Object.keys(sourceTree)) {
             if (sourceTree[key] instanceof Object && typeof targetTree[key] === 'undefined') {
                 targetTree[key] = {};
@@ -80,23 +80,20 @@ export class Library {
             return null;
         }
 
-        return this.libraryTree[
-            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
-        ];
+        return this.libraryTree[attributes[ATTRIBUTE_NAMESPACE] as string][attributes[ATTRIBUTE_PACK] as string][attributes[ATTRIBUTE_SYMBOL] as string];
     }
 
     public isInLibrary(attributes: AttributesInterface): boolean {
-        if (typeof this.libraryTree[attributes[ATTRIBUTE_NAMESPACE]] === 'undefined') {
+        if (typeof this.libraryTree[attributes[ATTRIBUTE_NAMESPACE] as string] === 'undefined') {
             return false;
         }
 
-        if (typeof this.libraryTree[attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]] === 'undefined') {
+        if (typeof this.libraryTree[attributes[ATTRIBUTE_NAMESPACE] as string][attributes[ATTRIBUTE_PACK] as string] === 'undefined') {
             return false;
         }
 
         return typeof this.libraryTree[
-            attributes[ATTRIBUTE_NAMESPACE]][attributes[ATTRIBUTE_PACK]][attributes[ATTRIBUTE_SYMBOL]
-        ] !== 'undefined';
+            attributes[ATTRIBUTE_NAMESPACE] as string][attributes[ATTRIBUTE_PACK] as string][attributes[ATTRIBUTE_SYMBOL] as string] !== 'undefined';
     }
 
     private static validAttributes(attributes: AttributesInterface): boolean {

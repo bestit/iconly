@@ -1,6 +1,6 @@
 {
     "name": "@best-it/iconly",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "description": "SVG icon system utilising a custom element",
     "repository": {
         "type": "git",
@@ -18,16 +18,12 @@
         }
     ],
     "license": "MIT",
-    "main": "./dist/commonjs/index.js",
-    "module": "./dist/esm/index.js",
     "type": "module",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
     "types": "./dist/types/index.d.ts",
     "exports": {
-        ".": {
-            "types": "./dist/types/index.d.ts",
-            "import": "./dist/esm/index.js",
-            "require": "./dist/commonjs/index.js"
-        },
+        ".": "./dist/index.js",
         "./src": "./src/index.ts",
         "./src/*": "./src/*"
     },
@@ -36,30 +32,22 @@
         "src"
     ],
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^5.17.0",
-        "@typescript-eslint/parser": "^5.17.0",
-        "@webcomponents/webcomponentsjs": "^2.5.0",
-        "eslint": "^7.9.0",
-        "eslint-config-bestit-base": "^1.1",
-        "shx": "^0.3.3",
-        "ts-loader": "^9.2.2",
-        "typescript": "^4.6.3",
-        "webpack": "^5.38.1",
-        "webpack-cli": "^4.7.0",
-        "webpack-dev-server": "^4.7"
+        "@stylistic/eslint-plugin": "^1.3.3",
+        "@typescript-eslint/eslint-plugin": "^6.11.0",
+        "@typescript-eslint/parser": "^6.11.0",
+        "eslint": "^8.50.0",
+        "shx": "^0.3.4",
+        "typescript": "^5.2.2"
     },
     "scripts": {
-        "clean": "shx rm -rf dist",
-        "build": "yarn run clean && yarn run build:declaration && yarn run build:esm && yarn run build:commonjs && yarn run build:umd",
-        "build:declaration": "tsc --declaration true --declarationDir ./dist/types --emitDeclarationOnly true",
-        "build:esm": "tsc --module es2015 --target es5 --outDir dist/es5/esm && tsc --module es2015 --target es6 --outDir dist/esm",
-        "build:commonjs": "tsc --module commonjs --target es5 --outDir dist/es5/commonjs && tsc --module commonjs --target es6 --outDir dist/commonjs",
-        "build:umd": "webpack --mode=production --config-name es5 && webpack --mode=production --config-name es6",
-        "serve:es5": "webpack serve --config-name es5 --mode=development",
-        "serve:es6": "webpack serve --config-name es6 --mode=development",
-        "eslint": "npx eslint ./src/**/*.ts",
-        "publish": "yarn publish --access public",
-        "publish:beta": "yarn publish --access public --tag beta"
+        "build": "yarn eslint && yarn build:clean && yarn build:types && yarn build:module",
+        "build:clean": "shx rm -rf dist",
+        "build:module": "tsc",
+        "build:types": "tsc --declaration true --declarationDir ./dist/types --emitDeclarationOnly true",
+        "eslint": "eslint ./src/**/*.ts",
+        "publish:public": "yarn build && npm publish --access public",
+        "publish:beta": "yarn build && npm publish --access public --tag beta",
+        "publish:dry": "yarn build && npm publish --access public --dry-run"
     },
     "dependencies": {}
 }
