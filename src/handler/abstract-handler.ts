@@ -6,6 +6,8 @@ import { CustomElement } from '../classes/custom-element.js';
 export abstract class AbstractHandler implements HandlerInterface {
     private priority: number = 0;
 
+    private caches: { [url: string]: Promise<Cache> } = {};
+
     constructor(priority: number) {
         this.priority = priority;
     }
@@ -30,10 +32,25 @@ export abstract class AbstractHandler implements HandlerInterface {
      * @throws {Error}
      */
     public async fetchSvg(url: string): Promise<string> {
-        const response = await fetch(url);
+        let response = null;
 
-        if (!response.ok) {
-            throw new Error(`${response.status} ${response.statusText} for ${url}`);
+        try {
+            if (typeof this.caches[url] === 'undefined') {
+                this.caches[url] = new Promise((resolve, reject) => {
+                    caches.open('iconly').then(cache => {
+                        cache.add(url).then(() => resolve(cache)).catch((error) => reject(error));
+                    });
+                });
+            }
+
+            const cache = await this.caches[url];
+            response = await cache.match(url);
+        } catch (error) {
+            // empty
+        }
+
+        if (!response) {
+            throw new Error(`${url} not found`);
         }
 
         return response.text();
