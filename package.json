@@ -1,6 +1,6 @@
 {
     "name": "@best-it/iconly",
-    "version": "1.2.0",
+    "version": "1.2.1-beta.1",
     "description": "SVG icon system utilising a custom element",
     "repository": {
         "type": "git",
@@ -37,12 +37,13 @@
         "@typescript-eslint/parser": "^6.11.0",
         "eslint": "^8.50.0",
         "shx": "^0.3.4",
-        "typescript": "^5.2.2"
+        "typescript": "^5.2.2",
+        "vite": "^5.2.13"
     },
     "scripts": {
         "build": "yarn eslint && yarn build:clean && yarn build:types && yarn build:module",
         "build:clean": "shx rm -rf dist",
-        "build:module": "tsc",
+        "build:module": "tsc && vite build",
         "build:types": "tsc --declaration true --declarationDir ./dist/types --emitDeclarationOnly true",
         "eslint": "eslint ./src/**/*.ts",
         "publish:public": "yarn build && npm publish --access public",
