@@ -1,21 +1,18 @@
-/* eslint-disable max-classes-per-file */
 import { CustomElement } from './classes/custom-element.js';
 import { ElementData, type ConfigInterface } from './classes/element-data.js';
-import { type LibraryTreeInterface } from './classes/library.js';
 
 export class Iconly {
     private static elements: { [key: string]: ElementData } = {};
 
     public static createElement(
         element: string,
-        config: ConfigInterface = {},
-        libraryTree: LibraryTreeInterface = {},
-        defineCustomElement: boolean = true
+        config: Partial<ConfigInterface> = {},
+        defineCustomElement: boolean = true,
     ): void {
-        Iconly.elements[element] = new ElementData(element, config, libraryTree);
+        Iconly.elements[element] = new ElementData(element, config);
 
         /**
-         * Define new element and use anonymous class extended from CustomElement,
+         * Define a new element and use an anonymous class extended from CustomElement,
          * this allows multiple definitions with the "same" class
          */
         if (defineCustomElement) {
@@ -27,4 +24,3 @@ export class Iconly {
         return Iconly.elements[element];
     }
 }
-/* eslint-enable max-classes-per-file */

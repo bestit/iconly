@@ -1,31 +1,27 @@
-import { FetchHandler } from '../handler/fetch-handler.js';
-import { LibraryRemoteHandler } from '../handler/library-remote-handler.js';
-import { LibraryInlineHandler } from '../handler/library-inline-handler.js';
+import { SymbolHandler } from '../handler/symbol-handler.js';
 import { NullHandler } from '../handler/null-handler.js';
+import { SrcHandler } from '../handler/src-handler.js';
 import { CustomElement } from './custom-element.js';
 
-/* eslint-disable no-unused-vars */
 export interface HandlerInterface {
     supports(
         element: CustomElement
-    ): boolean,
+    ): boolean;
     getIcon(
         element: CustomElement
-    ): Promise<string>,
-    getPriority(): number,
-    setPriority(priority: number): void,
+    ): Promise<string | undefined>;
+    getPriority(): number;
+    setPriority(priority: number): void;
 }
-/* eslint-enable no-unused-vars */
 
 export class IconHandler {
     private handlerList: HandlerInterface[];
 
     constructor() {
         this.handlerList = [
+            new SymbolHandler(2),
+            new SrcHandler(1),
             new NullHandler(0),
-            new LibraryInlineHandler(1),
-            new LibraryRemoteHandler(2),
-            new FetchHandler(3)
         ];
     }
 
@@ -33,8 +29,8 @@ export class IconHandler {
      * @throws {Error}
      */
     public getIcon(
-        element: CustomElement
-    ): Promise<string> {
+        element: CustomElement,
+    ): Promise<string | undefined> {
         const iconHandler = this.handlerList.find((handler) => {
             return handler.supports(element);
         });
@@ -76,7 +72,7 @@ export class IconHandler {
     }
 
     public order(): this {
-        this.handlerList.sort((handlerA, handlerB) => handlerA.getPriority() - handlerB.getPriority());
+        this.handlerList.sort((handlerA, handlerB) => handlerB.getPriority() - handlerA.getPriority());
 
         return this;
     }

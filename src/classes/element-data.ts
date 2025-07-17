@@ -1,53 +1,72 @@
-import { Library, type LibraryTreeInterface } from './library.js';
 import { IconHandler } from './icon-handler.js';
 import { CustomElement } from './custom-element.js';
 
-/* eslint-disable no-unused-vars, no-undef */
 export interface ConfigInterface {
-    fetchPattern?: string,
-    urlTestPattern?: RegExp,
-    intersectionObserver?: IntersectionObserverInit,
-    defaultNamespace?: string,
-    defaultPack?: string,
-    defaultFetchPattern?: string,
-    createIntersectionObserver?: boolean
+    fetchPattern: string | undefined;
+    intersectionObserver: IntersectionObserverInit;
+    defaultNamespace: string;
+    defaultPack: string;
+    createIntersectionObserver: boolean;
+    cacheTimeout: number;
+    svgDisallowed: string[];
 }
-/* eslint-enable no-unused-vars, no-undef */
 
 export const defaultConfig: ConfigInterface = {
+    fetchPattern: undefined,
     defaultNamespace: 'storefront',
     defaultPack: 'default',
-    defaultFetchPattern: undefined,
-    urlTestPattern:
-        /^(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._+~#=/]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
     intersectionObserver: {},
     createIntersectionObserver: true,
+    cacheTimeout: 5 * 60 * 1000,
+    svgDisallowed: [
+        'a',
+        'animate',
+        'color-profile',
+        'cursor',
+        'discard',
+        'fedropshadow',
+        'font-face',
+        'font-face-format',
+        'font-face-name',
+        'font-face-src',
+        'font-face-uri',
+        'foreignobject',
+        'hatch',
+        'hatchpath',
+        'mesh',
+        'meshgradient',
+        'meshpatch',
+        'meshrow',
+        'missing-glyph',
+        'script',
+        'set',
+        'solidcolor',
+        'unknown',
+        'use',
+    ],
 };
 
 export class ElementData {
-    private element: string;
+    private readonly element: string;
     private config: ConfigInterface;
-    private library: Library;
-    private iconHandler: IconHandler;
+    private readonly iconHandler: IconHandler;
     private intersectionObserver: IntersectionObserver | null;
 
     constructor(
         element: string,
-        config: ConfigInterface = {},
-        libraryTree: LibraryTreeInterface = {}
+        config: Partial<ConfigInterface> = {},
     ) {
         this.element = element;
         this.config = {
             ...defaultConfig,
-            ...config
+            ...config,
         };
-        this.library = new Library(libraryTree);
         this.iconHandler = new IconHandler();
         this.intersectionObserver = null;
 
-        if (typeof this.config.createIntersectionObserver !== 'undefined' &&
-            this.config.createIntersectionObserver !== null &&
-            this.config.createIntersectionObserver
+        if (typeof this.config.createIntersectionObserver !== 'undefined'
+            && this.config.createIntersectionObserver !== null
+            && this.config.createIntersectionObserver
         ) {
             this.createIntersectionObserver();
         }
@@ -60,7 +79,7 @@ export class ElementData {
     public setConfig(config: ConfigInterface): this {
         this.config = {
             ...defaultConfig,
-            ...config
+            ...config,
         };
 
         return this;
@@ -70,11 +89,7 @@ export class ElementData {
         return this.iconHandler;
     }
 
-    public getLibrary(): Library {
-        return this.library;
-    }
-
-    public getIcon(element: CustomElement): Promise<string> {
+    public getIcon(element: CustomElement): Promise<string | undefined> {
         return this.iconHandler.getIcon(element);
     }
 
@@ -89,7 +104,7 @@ export class ElementData {
     public createIntersectionObserver(): void {
         if ('IntersectionObserver' in window) {
             this.intersectionObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
+                entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         const customElement = entry.target;
 
@@ -97,7 +112,7 @@ export class ElementData {
                             `${this.element}-intersection`,
                             {
                                 bubbles: true,
-                            }
+                            },
                         ));
 
                         observer.unobserve(customElement);

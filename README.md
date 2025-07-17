@@ -61,6 +61,11 @@ And it's actually possible to omit the pack and namespace attributes in this cas
 <iconly symbol="my-icon"></iconly>
 ```
 
+Or you can simply use the src attribute to define the url to the icon to load:
+```html
+<iconly src="https://YOUR_URL/ICON.svg"></iconly>
+```
+
 The default values for pack and namespace are of course part of the config too, so feel free to change them:
 ```javascript
 Iconly.getElement('iconly').setConfig({
@@ -69,82 +74,15 @@ Iconly.getElement('iconly').setConfig({
 });
 ```
 
-### Adding an icon library
-You can either pass the library in the createElement method, like this:
-```javascript
-Iconly.createElement(
-    'iconly',
-    {},
-    {
-        'storefront': {
-            'default': {
-                'my-icon': '/icons/storefront/default/my-icon.svg'
-            }
-        }
-    }
-);
-```
-or you can load an already created element and modify its library:
-```javascript
-// Overwrite the complete library tree
-Iconly.getElement('iconly').getLibrary().setTree({
-    'storefront': {
-        'default': {
-            'my-icon': '/icons/storefront/default/my-icon.svg'
-        }
-    }
-});
-
-// Merge with the existing library tree
-Iconly.getElement('iconly').getLibrary().mergeTree({
-    'storefront': {
-        'default': {
-            'my-icon': '/icons/storefront/default/my-icon.svg'
-        }
-    }
-});
-```
-
-This is pretty much the same like the *fetchPattern* example from the last section, the custom element wil look in the library and find the url to fetch from. But in the case you could actually rename your symbol, pack or namespace and keep the url like it is to create a mapping for your icons.
-
-But you don't have to store another url in the library, you could also store the complete SVG code as a string:
-```javascript
-// Overwrite the complete library tree
-Iconly.getElement('iconly').getLibrary().setTree({
-    'storefront': {
-        'default': {
-            'my-icon': '<svg>...</svg>'
-        }
-    }
-});
-```
-This way the custom element wouldn't fetch the svg resource, instead it would load it directly from the library.
-
-And the HTML for all these examples is still the same:
-```html
-<iconly symbol="my-icon"></iconly>
-```
-
 ### Element Attributes
-Besides the symbol, pack and namespace attributes to identify the correct icon, there are some additional attributes to modify an icon.
-
-* rotate
-    ```html
-    <iconly symbol="my-icon" rotate="90deg"></iconly>
-    ```
-* flip
-    ```html
-    <iconly symbol="my-icon" flip="horizontal"></iconly>
-    <iconly symbol="my-icon" flip="vertical"></iconly>
-    <iconly symbol="my-icon" flip="both"></iconly>
-    ```
+Besides the symbol, pack, namespace or src attributes to identify the correct icon, there are some additional attributes to modify an icon.
 
 * loading
     ```html
-    <!-- Default icon is loader directly -->
+    <!-- Icon is loaded directly -->
     <iconly symbol="my-icon" loading="eager"></iconly>
 
-    <!-- Lazy loaded via intersection observer -->
+    <!-- Icon is loaded lazy (default behavior) -->
     <iconly symbol="my-icon" loading="lazy"></iconly>
     ```
 
@@ -159,40 +97,21 @@ Besides the symbol, pack and namespace attributes to identify the correct icon, 
     }
     ```
 
-* mode
-    ```html
-    <!-- Default is replace -->
-    <iconly symbol="my-icon" mode="replace"></iconly>
-
-    <!-- Inline doesn't replace the icon, allows predifined svgs-->
-    <iconly symbol="my-icon" mode="inline">
-        <svg>...</svg>
-    </iconly>
-
-    <!-- Wraps multiple items and writes the icon into reusable css variable instead -->
-    <iconly symbol="my-icon" mode="wrap" style="--icon: url(svg)">
-        <button></button>
-    </iconly>
-    ```
-
 ## Handler
-Iconly uses handler to identify the configuratuion and attributes for each element and determines which handler fits best.
+Iconly uses handler to identify the configuration and attributes for each element and determines which handler fits best.
 
 Iconly uses the following handler:
 
 * NullHandler
-    Checks if the element doesn't have enough attributes to be processed by the following handlers. Throws an error if not enough attributes are set.
+    Checks if the element doesn't have enough attributes to be processed by the following handlers. Doesn't replace the custom element content, useful to directly inline some SVGs without external loading.
 
-* LibraryInlineHandler
-    Checks if the stored libary value doesn't look like an URL and returns it as an inline SVG.
+* SrcHandler
+  Uses the src attribute to load the icon via url
 
-* LibraryRemoteHandler
-    Checks if the stored libary value does look like an URL, fetches the asset and returns it code.
+* SymbolHandler
+    Uses the *fetchPattern* if definied to load the svg from the URL and returns its code.
 
-* FetchHandler
-    Uses the *fetchPattern*, if definied to load the svg from the URL and returns its code.
-
-It is possible to modify these handler.
+It is possible to modify these handlers.
 
 Get handler list:
 ```javascript
@@ -207,7 +126,7 @@ You can reorder them by changing their priorities:
 ```javascript
 Iconly
     .getElement('test-icon')
-    .getIconHandlr()
+    .getIconHandler()
     // Index starts with 0 for NullHandler
     .getHandler(0)
     .setPriority(99);
@@ -219,17 +138,23 @@ Iconly
     .order();
 ```
 
-You can add or remove handler:
-```javascript
+You can add or remove custom handler classes:
+```typescript
 // Creating new handler with esm
-import { AbstractHandler } from 'PATH_TO_ICONLY/dist/esm/handler/abstract-handler';
+import type { HandlerInterface } from '@best-it/iconly/classes/icon-handler.js';
 
-class CustomHandler extends AbstractHandler {
+class CustomHandler implements HandlerInterface  {
     supports(element) {
         // Your code
     }
     getIcon(element) {
         // Your code
+    }
+    getPriority() {
+        // Your code
+    }
+    setPriority(priority: number) {
+       // Your code
     }
 }
 
@@ -252,20 +177,17 @@ Iconly.getElement('test-icon').getIconHandler().setHandlerList([
 ```
 
 ## Development
-Run dev server for either es5 or es6 mode:
+Run yarn link in this package folder 
 ```bash
-yarn run serve:es5
+yarn link
 ```
 
+And then run yarn link with the package name in you project
 ```bash
-yarn run serve:es6
+yarn link @best-it/iconly
 ```
 
-Building:
+## Building
 ```bash
 yarn run build
 ```
-
-
-## Iconly structure design
-The structure of the Iconly source code is visualized as an UML chart at [GitMind.com](https://gitmind.com/app/flowchart/4b92539410).

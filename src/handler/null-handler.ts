@@ -1,39 +1,16 @@
 import { AbstractHandler } from './abstract-handler.js';
-import {
-    type AttributesInterface,
-    ATTRIBUTE_NAMESPACE,
-    ATTRIBUTE_PACK,
-    ATTRIBUTE_SYMBOL,
-    CustomElement
-} from '../classes/custom-element.js';
 
 export class NullHandler extends AbstractHandler {
-    public supports(
-        element: CustomElement
-    ): boolean {
-        const attributes: AttributesInterface = element.getAttributes();
-
-        if (attributes[ATTRIBUTE_NAMESPACE] === null) {
-            return true;
-        }
-
-        if (attributes[ATTRIBUTE_PACK] === null) {
-            return true;
-        }
-
-        return attributes[ATTRIBUTE_SYMBOL] === null || attributes[ATTRIBUTE_SYMBOL] === '';
+    public supports(): boolean {
+        return true;
     }
 
     /**
      * @throws {Error}
      */
-    public getIcon(
-        element: CustomElement
-    ): Promise<string> {
-        const attributes: AttributesInterface = element.getAttributes();
-
-        return new Promise<string>((resolve, reject) => {
-            reject(new Error(`Can't find icon matching attributes: ${JSON.stringify(attributes)}`));
+    public getIcon(): Promise<string | undefined> {
+        return new Promise((resolve) => {
+            resolve(undefined);
         });
     }
 }

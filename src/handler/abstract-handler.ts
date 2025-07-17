@@ -1,12 +1,8 @@
 import { type HandlerInterface } from '../classes/icon-handler.js';
-import { type ConfigInterface } from '../classes/element-data.js';
 import { CustomElement } from '../classes/custom-element.js';
 
-/* eslint-disable no-unused-vars */
 export abstract class AbstractHandler implements HandlerInterface {
     private priority: number = 0;
-
-    private caches: { [url: string]: Promise<Cache> } = {};
 
     constructor(priority: number) {
         this.priority = priority;
@@ -14,11 +10,11 @@ export abstract class AbstractHandler implements HandlerInterface {
 
     public abstract supports(
         element: CustomElement
-    ): boolean
+    ): boolean;
 
     public abstract getIcon(
         element: CustomElement
-    ): Promise<string>
+    ): Promise<string | undefined>;
 
     public getPriority(): number {
         return this.priority;
@@ -28,40 +24,84 @@ export abstract class AbstractHandler implements HandlerInterface {
         this.priority = priority;
     }
 
+    private isFresh(timestamp: string, cacheTimeout: number) {
+        const now = Date.now();
+        const cachedTime = parseInt(timestamp);
+        return now - cachedTime < cacheTimeout;
+    }
+
+    private async clearExpiredCacheEntries(cache: Cache, cacheTimeout: number): Promise<void> {
+        const all = await cache.keys();
+
+        for (const request of all) {
+            const cachedResponse = await cache.match(request.url);
+
+            if (cachedResponse) {
+                const timestamp = cachedResponse.headers.get('X-Cache-Timestamp');
+
+                if (timestamp && !this.isFresh(timestamp, cacheTimeout)) {
+                    await cache.delete(request.url);
+                }
+            }
+        }
+    }
+
     /**
      * @throws {Error}
      */
-    public async fetchSvg(url: string): Promise<string> {
-        let response = null;
+    public async fetchSvg(url: string, element: CustomElement): Promise<string> {
+        const rejectMessage = `Icon ${url} could not be loaded`;
+        const contentType = 'image/svg+xml';
 
         try {
-            if (typeof this.caches[url] === 'undefined') {
-                this.caches[url] = new Promise((resolve, reject) => {
-                    caches.open('iconly').then(cache => {
-                        cache.add(url).then(() => resolve(cache)).catch((error) => reject(error));
-                    });
-                });
+            const cacheTimeout = element.getElementData().getConfig().cacheTimeout;
+
+            if (!window?.caches || !window?.isSecureContext || !cacheTimeout) {
+                const networkResponse = await fetch(url);
+
+                if (!networkResponse.ok || networkResponse.headers.get('content-type') !== contentType) {
+                    return Promise.reject(rejectMessage);
+                }
+
+                return networkResponse.text();
             }
 
-            const cache = await this.caches[url];
-            response = await cache.match(url);
-        } catch (error) {
-            // empty
+            const cache = await caches.open('iconly');
+
+            await this.clearExpiredCacheEntries(cache, cacheTimeout);
+
+            const cachedResponse = await cache.match(url);
+
+            if (cachedResponse) {
+                const timestamp = cachedResponse.headers.get('X-Cache-Timestamp');
+
+                if (timestamp && this.isFresh(timestamp, cacheTimeout)) {
+                    return cachedResponse.text();
+                }
+            }
+
+            const networkResponse = await fetch(url);
+
+            if (!networkResponse.ok || networkResponse.headers.get('content-type') !== contentType) {
+                return Promise.reject(rejectMessage);
+            }
+
+            const tempResponse = networkResponse.clone();
+            const newResponse = new Response(tempResponse.body, {
+                headers: {
+                    ...Object.fromEntries(tempResponse.headers.entries()),
+                    'X-Cache-Timestamp': Date.now().toString(),
+                },
+            });
+
+            await cache.put(url, newResponse);
+
+            return networkResponse.text();
         }
-
-        if (!response) {
-            throw new Error(`${url} not found`);
+        catch (error) {
+            throw new Error(rejectMessage, {
+                cause: error,
+            });
         }
-
-        return response.text();
-    }
-
-    public isUrlSource(config: ConfigInterface, source: string): boolean {
-        if (!(config.urlTestPattern instanceof RegExp)) {
-            return false;
-        }
-
-        return source.match(config.urlTestPattern) !== null;
     }
 }
-/* eslint-enable no-unused-vars */

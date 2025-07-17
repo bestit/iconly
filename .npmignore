@@ -2,3 +2,5 @@
 **/tsconfig.json
 node_modules
 vite.config.js
+eslint.config.mjs
+src

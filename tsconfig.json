@@ -4,12 +4,13 @@
         "module": "node16",
         "target": "es2016",
         "lib": [
-            "es2016",
-            "dom"
+            "es2022",
+            "dom",
+            "dom.iterable"
         ],
         "outDir": "dist",
         "forceConsistentCasingInFileNames": true,
-        "sourceMap": true,
+        "sourceMap": false,
         "declaration": false,
         "verbatimModuleSyntax": true,
         "strict": true
