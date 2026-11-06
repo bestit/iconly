@@ -1,6 +1,12 @@
 .*
-**/tsconfig.json
 node_modules
-vite.config.js
-eslint.config.mjs
 src
+tests
+scripts
+**/tsconfig*.json
+vite.config.js
+vitest.config.ts
+eslint.config.mjs
+pnpm-lock.yaml
+pnpm-workspace.yaml
+DEVELOPMENT.md

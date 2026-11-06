@@ -4,7 +4,7 @@
     "description": "SVG icon system utilising a custom element",
     "repository": {
         "type": "git",
-        "url": "https://github.com/bestit/iconly.git"
+        "url": "git+https://github.com/bestit/iconly.git"
     },
     "author": "best it GmbH <info@bestit.de>",
     "contributors": [
@@ -19,37 +19,45 @@
     ],
     "license": "MIT",
     "type": "module",
+    "sideEffects": false,
     "main": "./dist/index.js",
     "module": "./dist/index.js",
-    "types": "./dist/types/index.d.ts",
+    "types": "./dist/index.d.ts",
     "exports": {
         ".": {
-            "import": {
-                "types": "./dist/types/index.d.ts",
-                "default": "./dist/index.js"
-            }
-        }
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
     },
     "files": [
         "dist"
     ],
-    "devDependencies": {
-        "@eslint/js": "^9.39.1",
-        "@stylistic/eslint-plugin": "^5.6.1",
-        "eslint": "^9.39.1",
-        "typescript": "^5.9.3",
-        "typescript-eslint": "^8.48.1",
-        "vite": "^7.2.6"
-    },
     "scripts": {
-        "build": "yarn audit && yarn eslint && yarn build:module && yarn build:types ",
-        "build:module": "vite build",
-        "build:types": "tsc --declaration true --declarationDir ./dist/types --emitDeclarationOnly true",
-        "eslint": "eslint ./src/**/*.ts",
-        "publish:public": "yarn build && npm publish --access public",
-        "publish:beta": "yarn build && npm publish --access public --tag beta",
-        "publish:dry": "yarn build && npm publish --access public --dry-run"
+        "lint": "eslint src tests vite.config.js",
+        "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
+        "test": "vitest run",
+        "build": "vite build",
+        "check:bundle": "node scripts/check-bundle.mjs",
+        "publint": "publint --strict",
+        "audit": "pnpm audit",
+        "publish:public": "node scripts/publish.mjs public",
+        "publish:beta": "node scripts/publish.mjs beta",
+        "publish:dry": "node scripts/publish.mjs dry"
     },
-    "dependencies": {},
-    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+    "devDependencies": {
+        "@arethetypeswrong/cli": "^0.18.5",
+        "@eslint/js": "^10.0.1",
+        "@microsoft/api-extractor": "^7.55.2",
+        "@stylistic/eslint-plugin": "^5.10.0",
+        "eslint": "^10.14.0",
+        "happy-dom": "^21.0.4",
+        "publint": "^0.3.25",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.72.1",
+        "vite": "^8.3.6",
+        "vite-plugin-dts": "^5.1.2",
+        "vitest": "^5.1.0"
+    },
+    "packageManager": "pnpm@12.18.0+sha512.9d7882d5dc82147ecfc4e062aa34834e0ad0296710a1837a1115ae012127d36b7109e321ac1598a1dd0a65597681b1e99917e12ed0d749eae91187943363beb3"
 }

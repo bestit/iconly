@@ -1,14 +1,15 @@
+import type { CustomElement } from './custom-element.js';
 import { IconHandler } from './icon-handler.js';
-import { CustomElement } from './custom-element.js';
 
 export interface ConfigInterface {
-    fetchPattern: string | undefined;
+    fetchPattern?: string;
     intersectionObserver: IntersectionObserverInit;
     defaultNamespace: string;
     defaultPack: string;
     createIntersectionObserver: boolean;
     cacheTimeout: number;
     svgDisallowed: string[];
+    allowedOrigins?: string[];
 }
 
 export const defaultConfig: ConfigInterface = {
@@ -17,7 +18,7 @@ export const defaultConfig: ConfigInterface = {
     defaultPack: 'default',
     intersectionObserver: {},
     createIntersectionObserver: true,
-    cacheTimeout: 5 * 60 * 1000,
+    cacheTimeout: 60 * 60 * 1000,
     svgDisallowed: [
         'a',
         'animate',
@@ -64,10 +65,7 @@ export class ElementData {
         this.iconHandler = new IconHandler();
         this.intersectionObserver = null;
 
-        if (typeof this.config.createIntersectionObserver !== 'undefined'
-            && this.config.createIntersectionObserver !== null
-            && this.config.createIntersectionObserver
-        ) {
+        if (this.config.createIntersectionObserver) {
             this.createIntersectionObserver();
         }
     }
@@ -76,11 +74,17 @@ export class ElementData {
         return this.config;
     }
 
-    public setConfig(config: ConfigInterface): this {
+    public setConfig(config: Partial<ConfigInterface>): this {
         this.config = {
             ...defaultConfig,
             ...config,
         };
+        this.intersectionObserver?.disconnect();
+        this.intersectionObserver = null;
+
+        if (this.config.createIntersectionObserver) {
+            this.createIntersectionObserver();
+        }
 
         return this;
     }
@@ -97,28 +101,30 @@ export class ElementData {
         return this.intersectionObserver;
     }
 
-    public setIntersectionObserver(intersectionObserver: IntersectionObserver | null) {
+    public setIntersectionObserver(intersectionObserver: IntersectionObserver | null): void {
         this.intersectionObserver = intersectionObserver;
     }
 
     public createIntersectionObserver(): void {
-        if ('IntersectionObserver' in window) {
-            this.intersectionObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        const customElement = entry.target;
-
-                        customElement.dispatchEvent(new CustomEvent(
-                            `${this.element}-intersection`,
-                            {
-                                bubbles: true,
-                            },
-                        ));
-
-                        observer.unobserve(customElement);
-                    }
-                });
-            }, this.getConfig().intersectionObserver);
+        if (typeof window === 'undefined' || typeof window.IntersectionObserver !== 'function') {
+            return;
         }
+
+        this.intersectionObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const customElement = entry.target;
+
+                    customElement.dispatchEvent(new CustomEvent(
+                        `${this.element}-intersection`,
+                        {
+                            bubbles: true,
+                        },
+                    ));
+
+                    observer.unobserve(customElement);
+                }
+            });
+        }, this.getConfig().intersectionObserver);
     }
 }

@@ -1,0 +1,3 @@
+# api-extractor and eslint still depend on minimatch 10, which is inside GHSA-g3hv-75wg-m249.
+overrides:
+  minimatch: ^11.0.1

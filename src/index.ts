@@ -1,26 +1,29 @@
-import { CustomElement } from './classes/custom-element.js';
-import { ElementData, type ConfigInterface } from './classes/element-data.js';
+import type { ConfigInterface, ElementData } from './lib/classes/element-data.js';
+import { defineIconlyElement } from './lib/classes/custom-element.js';
+import { getRegisteredElement } from './lib/registry.js';
+
+export type { ConfigInterface, ElementData } from './lib/classes/element-data.js';
+export type { HandlerInterface } from './lib/classes/icon-handler.js';
+export { CustomElement } from './lib/classes/custom-element.js';
+export { IconHandler } from './lib/classes/icon-handler.js';
+export type {
+    AttributesInterface,
+    IconlyErrorDetail,
+    IconlyLoadedDetail,
+    LoadingMode,
+} from './lib/attributes.js';
+export { Attributes, Loading } from './lib/attributes.js';
 
 export class Iconly {
-    private static elements: { [key: string]: ElementData } = {};
-
     public static createElement(
         element: string,
         config: Partial<ConfigInterface> = {},
         defineCustomElement: boolean = true,
     ): void {
-        Iconly.elements[element] = new ElementData(element, config);
-
-        /**
-         * Define a new element and use an anonymous class extended from CustomElement,
-         * this allows multiple definitions with the "same" class
-         */
-        if (defineCustomElement) {
-            window.customElements.define(element, class extends CustomElement {});
-        }
+        defineIconlyElement(element, config, defineCustomElement);
     }
 
-    public static getElement(element: string): ElementData {
-        return Iconly.elements[element];
+    public static getElement(element: string): ElementData | undefined {
+        return getRegisteredElement(element);
     }
 }

@@ -5,12 +5,7 @@ export class NullHandler extends AbstractHandler {
         return true;
     }
 
-    /**
-     * @throws {Error}
-     */
     public getIcon(): Promise<string | undefined> {
-        return new Promise((resolve) => {
-            resolve(undefined);
-        });
+        return Promise.resolve(undefined);
     }
 }
