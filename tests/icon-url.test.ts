@@ -28,6 +28,7 @@ describe('icon urls', () => {
     it('rejects credentials and origins outside the allowlist', () => {
         expect(() => resolveIconUrl('https://user:pass@cdn.example/icon.svg')).toThrow(/credentials/);
         expect(() => resolveIconUrl('https://cdn.example/icon.svg', ['https://icons.example'])).toThrow(/not allowed/);
+        expect(() => resolveIconUrl('https://cdn.example/icon.svg', [])).toThrow(/not allowed/);
         expect(resolveIconUrl('https://cdn.example/icon.svg', ['https://cdn.example'])).toBe('https://cdn.example/icon.svg');
     });
 });

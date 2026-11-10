@@ -1,5 +1,8 @@
+import { sanitizeSvg } from './sanitize-svg.js';
+
 const CACHE_NAME = 'iconly';
 const SVG_MEDIA_TYPE = 'image/svg+xml';
+const MAX_SVG_BYTES = 1_000_000;
 
 interface IconRequest {
     promise: Promise<string>;
@@ -84,6 +87,70 @@ async function deleteStoredIcon(url: string): Promise<void> {
     }
 }
 
+async function readLimitedText(response: Response, url: string): Promise<string> {
+    const declared = Number(response.headers.get('content-length'));
+
+    if (Number.isFinite(declared) && declared > MAX_SVG_BYTES) {
+        await response.body?.cancel();
+        throw new Error(`Icon ${url} could not be loaded`);
+    }
+
+    if (response.body === null) {
+        const text = await response.text();
+
+        if (new TextEncoder().encode(text).byteLength > MAX_SVG_BYTES) {
+            throw new Error(`Icon ${url} could not be loaded`);
+        }
+
+        return text;
+    }
+
+    const reader = response.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+
+    while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+            break;
+        }
+
+        if (value === undefined) {
+            continue;
+        }
+
+        total += value.byteLength;
+
+        if (total > MAX_SVG_BYTES) {
+            await reader.cancel();
+            throw new Error(`Icon ${url} could not be loaded`);
+        }
+
+        chunks.push(value);
+    }
+
+    const body = new Uint8Array(total);
+    let offset = 0;
+
+    for (const chunk of chunks) {
+        body.set(chunk, offset);
+        offset += chunk.byteLength;
+    }
+
+    return new TextDecoder().decode(body);
+}
+
+function sanitizedMarkup(text: string): string {
+    const svg = sanitizeSvg(text);
+
+    if (svg === null) {
+        throw new Error('Unsafe SVG was blocked');
+    }
+
+    return new XMLSerializer().serializeToString(svg);
+}
+
 async function fetchSvg(url: string): Promise<string> {
     const response = await fetch(url, {
         cache: 'default',
@@ -96,7 +163,7 @@ async function fetchSvg(url: string): Promise<string> {
         throw new Error(`Icon ${url} could not be loaded`);
     }
 
-    return response.text();
+    return sanitizedMarkup(await readLimitedText(response, url));
 }
 
 export function clearIconRequestMemory(): void {

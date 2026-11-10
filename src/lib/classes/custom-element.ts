@@ -5,6 +5,7 @@ import {
     type IconlyErrorDetail,
     type IconlyLoadedDetail,
     Loading,
+    type LoadingMode,
 } from '../attributes.js';
 import { defaultConfig, ElementData, type ConfigInterface } from './element-data.js';
 import { dropIconRequest } from '../icon-request.js';
@@ -21,6 +22,28 @@ function elementBase(): typeof HTMLElement {
     }
 
     return class {} as unknown as typeof HTMLElement;
+}
+
+function loadingMode(value: string | null): LoadingMode {
+    return value === Loading.Eager ? Loading.Eager : Loading.Lazy;
+}
+
+function attributesWithDefaults(attributes: AttributesInterface, config: ConfigInterface): AttributesInterface {
+    const resolved: AttributesInterface = { ...attributes };
+
+    if (resolved[Attributes.Namespace] == null) {
+        resolved[Attributes.Namespace] = config.defaultNamespace;
+    }
+
+    if (resolved[Attributes.Pack] == null) {
+        resolved[Attributes.Pack] = config.defaultPack;
+    }
+
+    if (resolved[Attributes.Loading] !== Loading.Eager) {
+        resolved[Attributes.Loading] = Loading.Lazy;
+    }
+
+    return resolved;
 }
 
 export function defineIconlyElement(
@@ -47,7 +70,7 @@ export class CustomElement extends elementBase() {
         super();
 
         this.elementName = this.tagName.toLowerCase();
-        this.elementAttributes[Attributes.Loading] = this.getAttribute(Attributes.Loading) ?? Loading.Lazy;
+        this.elementAttributes[Attributes.Loading] = loadingMode(this.getAttribute(Attributes.Loading));
         this.elementData = getRegisteredElement(this.elementName) ?? new ElementData(this.elementName);
         this.registerEvents();
     }
@@ -125,6 +148,11 @@ export class CustomElement extends elementBase() {
             return;
         }
 
+        if (key === Attributes.Loading) {
+            this.elementAttributes[key] = loadingMode(value);
+            return;
+        }
+
         this.elementAttributes[key] = value;
     }
 
@@ -133,22 +161,7 @@ export class CustomElement extends elementBase() {
     }
 
     public getAttributes(): AttributesInterface {
-        const config = this.elementData.getConfig() ?? defaultConfig;
-        const attributes: AttributesInterface = { ...this.elementAttributes };
-
-        if (attributes[Attributes.Namespace] == null) {
-            attributes[Attributes.Namespace] = config.defaultNamespace;
-        }
-
-        if (attributes[Attributes.Pack] == null) {
-            attributes[Attributes.Pack] = config.defaultPack;
-        }
-
-        if (attributes[Attributes.Loading] !== Loading.Eager) {
-            attributes[Attributes.Loading] = Loading.Lazy;
-        }
-
-        return attributes;
+        return attributesWithDefaults(this.elementAttributes, this.elementData.getConfig() ?? defaultConfig);
     }
 
     private registerEvents(): void {
@@ -249,15 +262,13 @@ export class CustomElement extends elementBase() {
     }
 
     private getIconByAttributes(attributes: AttributesInterface): Promise<string | undefined> {
-        const tempElement = document.createElement(this.elementName) as CustomElement;
+        const resolved = attributesWithDefaults(attributes, this.elementData.getConfig() ?? defaultConfig);
+        const source = {
+            getElementData: () => this.elementData,
+            getAttributes: () => resolved,
+        } as CustomElement;
 
-        for (const [key, value] of Object.entries(attributes)) {
-            if (typeof value === 'string') {
-                tempElement.setAttribute(key, value);
-            }
-        }
-
-        return this.elementData.getIcon(tempElement);
+        return this.elementData.getIcon(source);
     }
 
     private iconLoadedSuccess(svg: SVGElement): void {

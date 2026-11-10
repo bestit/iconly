@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Iconly } from '../src/index.js';
+import { Iconly, type IconlyLoadedDetail } from '../src/index.js';
 import { clearIconRequestMemory } from '../src/lib/icon-request.js';
 
 const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M0 0h10v10z"/></svg>';
@@ -143,6 +143,34 @@ describe('custom element', () => {
         await flush();
 
         expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('loads another icon from the event without creating an element', async () => {
+        const fetchMock = vi.fn(async () => svgResponse());
+        vi.stubGlobal('fetch', fetchMock);
+        const tag = nextTag();
+
+        Iconly.createElement(tag, {
+            fetchPattern: '/icons/%SYMBOL%.svg',
+            createIntersectionObserver: false,
+        });
+
+        const element = document.createElement(tag);
+        const loaded = new Promise<IconlyLoadedDetail>((resolve) => {
+            element.addEventListener(`${tag}-loaded`, (event) => {
+                resolve((event as CustomEvent<IconlyLoadedDetail>).detail);
+            });
+        });
+        element.setAttribute('symbol', 'cart');
+        document.body.append(element);
+        const detail = await loaded;
+        const created = vi.spyOn(document, 'createElement');
+
+        await detail.fetch({ symbol: 'other' });
+
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+        expect(created).not.toHaveBeenCalled();
+        created.mockRestore();
     });
 
     it('blocks an unsafe svg', async () => {

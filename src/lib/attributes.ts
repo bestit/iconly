@@ -20,7 +20,7 @@ export interface AttributesInterface {
     [Attributes.Pack]?: string;
     [Attributes.Namespace]?: string;
     [Attributes.Src]?: string;
-    [Attributes.Loading]?: string;
+    [Attributes.Loading]?: LoadingMode;
 }
 
 export interface IconlyLoadedDetail {

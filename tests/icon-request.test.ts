@@ -114,6 +114,37 @@ describe('loadIconText', () => {
         expect(fetchMock).toHaveBeenCalledTimes(2);
     });
 
+    it('stores the sanitized svg', async () => {
+        installCache();
+        const url = new URL('/icon.svg', window.location.href).href;
+        vi.stubGlobal('fetch', vi.fn(async () => new Response(
+            '<svg xmlns="http://www.w3.org/2000/svg"><path onclick="alert(1)" d="M0 0"/></svg>',
+            {
+                status: 200,
+                headers: { 'content-type': 'image/svg+xml' },
+            },
+        )));
+
+        const text = await loadIconText(url, hour);
+
+        expect(text).not.toContain('onclick');
+        expect(text).toContain('<path');
+        expect(store.get(url)?.body).not.toContain('onclick');
+        expect(store.get(url)?.body).toContain('<path');
+    });
+
+    it('rejects an svg larger than 1 MB', async () => {
+        installCache();
+        const oversized = `a`.repeat(1_000_001);
+        vi.stubGlobal('fetch', vi.fn(async () => new Response(oversized, {
+            status: 200,
+            headers: { 'content-type': 'image/svg+xml' },
+        })));
+
+        await expect(loadIconText('/icon.svg', hour)).rejects.toThrow(/could not be loaded/);
+        expect(store.size).toBe(0);
+    });
+
     it('rejects a response that is not an svg', async () => {
         vi.stubGlobal('fetch', vi.fn(async () => new Response('<html></html>', {
             status: 200,

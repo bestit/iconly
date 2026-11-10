@@ -26,7 +26,7 @@ export function resolveIconUrl(raw: string, allowedOrigins?: readonly string[]):
         throw new Error('Icon URLs cannot include credentials');
     }
 
-    if (allowedOrigins !== undefined && allowedOrigins.length > 0 && !allowedOrigins.includes(url.origin)) {
+    if (allowedOrigins !== undefined && !allowedOrigins.includes(url.origin)) {
         throw new Error(`Icon origin "${url.origin}" is not allowed`);
     }
 

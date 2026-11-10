@@ -38,7 +38,7 @@ export class IconHandler {
     }
 
     public getHandlerList(): HandlerInterface[] {
-        return this.handlerList;
+        return [...this.handlerList];
     }
 
     public setHandlerList(handlerList: HandlerInterface[]): this {

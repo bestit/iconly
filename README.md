@@ -129,15 +129,18 @@ document.querySelector('iconly')?.dispatchEvent(new CustomEvent('iconly-reload')
 
 ### Security
 
-`namespace`, `pack`, and `symbol` are encoded and cannot contain `/`, `\`, or `..`. Only `http:` and `https:` URLs are requested. Set `allowedOrigins` to refuse any other origin. Leave it unset to allow the URLs you pass in `src`.
+`namespace`, `pack`, and `symbol` are encoded and cannot contain `/`, `\`, or `..`. Only `http:` and `https:` URLs are requested.
+
+The project that initializes Iconly sets `allowedOrigins` once in `createElement` or `setConfig`. The list applies to every `symbol` and `src` load for that element. Omit it to allow any `http:` or `https:` URL. An empty list refuses every origin.
 
 ```ts
 Iconly.createElement('iconly', {
+    fetchPattern: '/icons/%NAMESPACE%/%PACK%/%SYMBOL%.svg',
     allowedOrigins: [window.location.origin],
 });
 ```
 
-The SVG is parsed as XML and reduced to graphic elements and geometry attributes before it is inserted. Script, event handlers, `foreignObject`, `use`, links, and external URLs are removed. `svgDisallowed` is an extra denylist on top of that allowlist. An empty list does not turn the allowlist off.
+The SVG is parsed as XML and reduced to graphic elements and geometry attributes before it is inserted. Responses larger than 1 MB are rejected. Script, event handlers, `foreignObject`, `use`, links, and external URLs are removed. `svgDisallowed` is an extra denylist on top of that allowlist. An empty `svgDisallowed` list does not turn the allowlist off.
 
 ### Events
 

@@ -40,6 +40,24 @@ class TestHandler implements HandlerInterface {
     }
 }
 
+describe('ElementData config', () => {
+    it('copies the default denylist and observer options', () => {
+        const observer = { rootMargin: '10px' };
+        const data = new ElementData('iconly-config', {
+            intersectionObserver: observer,
+        });
+
+        data.getConfig().svgDisallowed.push('path');
+        observer.rootMargin = '99px';
+
+        const fresh = new ElementData('iconly-config-fresh');
+
+        expect(fresh.getConfig().svgDisallowed).not.toContain('path');
+        expect(data.getConfig().intersectionObserver.rootMargin).toBe('10px');
+        expect(fresh.getConfig().intersectionObserver).not.toBe(data.getConfig().intersectionObserver);
+    });
+});
+
 describe('IconHandler', () => {
     it('selects the symbol handler before src when a fetch pattern exists', async () => {
         const handler = new ElementData('iconly-handler', {
@@ -64,5 +82,15 @@ describe('IconHandler', () => {
         expect(handler.getHandlerList()).toHaveLength(2);
         expect(handler.getHandler(0)?.getPriority()).toBe(5);
         expect(handler.getHandler(9)).toBeUndefined();
+    });
+
+    it('returns a copy of the handler list', () => {
+        const handler = new IconHandler();
+        const list = handler.getHandlerList();
+        const length = list.length;
+
+        list.pop();
+
+        expect(handler.getHandlerList()).toHaveLength(length);
     });
 });

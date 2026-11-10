@@ -47,6 +47,18 @@ export const defaultConfig: ConfigInterface = {
     ],
 };
 
+function configFrom(config: Partial<ConfigInterface> = {}): ConfigInterface {
+    return {
+        ...defaultConfig,
+        ...config,
+        intersectionObserver: {
+            ...defaultConfig.intersectionObserver,
+            ...config.intersectionObserver,
+        },
+        svgDisallowed: [...(config.svgDisallowed ?? defaultConfig.svgDisallowed)],
+    };
+}
+
 export class ElementData {
     private readonly element: string;
     private config: ConfigInterface;
@@ -58,10 +70,7 @@ export class ElementData {
         config: Partial<ConfigInterface> = {},
     ) {
         this.element = element;
-        this.config = {
-            ...defaultConfig,
-            ...config,
-        };
+        this.config = configFrom(config);
         this.iconHandler = new IconHandler();
         this.intersectionObserver = null;
 
@@ -75,10 +84,7 @@ export class ElementData {
     }
 
     public setConfig(config: Partial<ConfigInterface>): this {
-        this.config = {
-            ...defaultConfig,
-            ...config,
-        };
+        this.config = configFrom(config);
         this.intersectionObserver?.disconnect();
         this.intersectionObserver = null;
 
