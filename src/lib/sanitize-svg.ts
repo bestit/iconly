@@ -1,3 +1,5 @@
+export type SanitizerMode = 'off' | 'basic' | 'strict';
+
 const ALLOWED_ELEMENTS = new Set([
     'svg',
     'g',
@@ -73,9 +75,17 @@ const ALLOWED_ATTRIBUTES = new Set([
     'visibility',
 ]);
 
+const BASIC_REMOVED_ELEMENTS = new Set([
+    'script',
+    'foreignobject',
+    'iframe',
+    'object',
+    'embed',
+]);
+
 const URL_VALUE = /url\s*\(\s*(['"]?)([^'")]+)\1\s*\)/gi;
 
-function isUnsafeAttribute(name: string, value: string): boolean {
+function isStrictlyUnsafeAttribute(name: string, value: string): boolean {
     const normalized = name.toLowerCase();
 
     if (normalized.startsWith('on')) {
@@ -110,34 +120,43 @@ function isUnsafeAttribute(name: string, value: string): boolean {
     return false;
 }
 
-function isAllowedElement(element: Element, disallowed: readonly string[]): boolean {
-    const name = element.localName.toLowerCase();
-
-    if (!ALLOWED_ELEMENTS.has(name)) {
-        return false;
-    }
-
-    return !disallowed.some(entry => entry.toLowerCase() === name);
-}
-
-function cleanElement(element: Element, disallowed: readonly string[]): void {
+function cleanStrict(element: Element): void {
     for (const attribute of [...element.attributes]) {
-        if (isUnsafeAttribute(attribute.name, attribute.value)) {
+        if (isStrictlyUnsafeAttribute(attribute.name, attribute.value)) {
             element.removeAttribute(attribute.name);
         }
     }
 
     for (const child of [...element.children]) {
-        if (!isAllowedElement(child, disallowed)) {
+        if (!ALLOWED_ELEMENTS.has(child.localName.toLowerCase())) {
             child.remove();
             continue;
         }
 
-        cleanElement(child, disallowed);
+        cleanStrict(child);
     }
 }
 
-export function sanitizeSvg(svgText: string, disallowed: readonly string[] = []): SVGElement | null {
+function cleanBasic(element: Element): void {
+    for (const attribute of [...element.attributes]) {
+        const name = attribute.name.toLowerCase();
+
+        if (name.startsWith('on') || attribute.value.toLowerCase().includes('javascript:')) {
+            element.removeAttribute(attribute.name);
+        }
+    }
+
+    for (const child of [...element.children]) {
+        if (BASIC_REMOVED_ELEMENTS.has(child.localName.toLowerCase())) {
+            child.remove();
+            continue;
+        }
+
+        cleanBasic(child);
+    }
+}
+
+export function sanitizeSvg(svgText: string, mode: SanitizerMode = 'strict'): SVGElement | null {
     const document = new DOMParser().parseFromString(svgText, 'image/svg+xml');
     const root = document.documentElement;
 
@@ -145,11 +164,16 @@ export function sanitizeSvg(svgText: string, disallowed: readonly string[] = [])
         return null;
     }
 
-    if (!isAllowedElement(root, disallowed)) {
+    if (root.localName.toLowerCase() !== 'svg') {
         return null;
     }
 
-    cleanElement(root, disallowed);
+    if (mode === 'strict') {
+        cleanStrict(root);
+    }
+    else if (mode === 'basic') {
+        cleanBasic(root);
+    }
 
     if (!(root instanceof SVGElement)) {
         return null;

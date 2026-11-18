@@ -29,6 +29,6 @@ export class SymbolHandler extends AbstractHandler {
             config.allowedOrigins,
         );
 
-        return loadIconText(url, config.cacheTimeout);
+        return loadIconText(url, config.cacheTimeout, config.sanitizer);
     }
 }

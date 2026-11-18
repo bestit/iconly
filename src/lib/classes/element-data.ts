@@ -1,5 +1,8 @@
+import type { SanitizerMode } from '../sanitize-svg.js';
 import type { CustomElement } from './custom-element.js';
 import { IconHandler } from './icon-handler.js';
+
+export type { SanitizerMode } from '../sanitize-svg.js';
 
 export interface ConfigInterface {
     fetchPattern?: string;
@@ -8,7 +11,7 @@ export interface ConfigInterface {
     defaultPack: string;
     createIntersectionObserver: boolean;
     cacheTimeout: number;
-    svgDisallowed: string[];
+    sanitizer: SanitizerMode;
     allowedOrigins?: string[];
 }
 
@@ -19,32 +22,7 @@ export const defaultConfig: ConfigInterface = {
     intersectionObserver: {},
     createIntersectionObserver: true,
     cacheTimeout: 60 * 60 * 1000,
-    svgDisallowed: [
-        'a',
-        'animate',
-        'color-profile',
-        'cursor',
-        'discard',
-        'fedropshadow',
-        'font-face',
-        'font-face-format',
-        'font-face-name',
-        'font-face-src',
-        'font-face-uri',
-        'foreignobject',
-        'hatch',
-        'hatchpath',
-        'mesh',
-        'meshgradient',
-        'meshpatch',
-        'meshrow',
-        'missing-glyph',
-        'script',
-        'set',
-        'solidcolor',
-        'unknown',
-        'use',
-    ],
+    sanitizer: 'strict',
 };
 
 function configFrom(config: Partial<ConfigInterface> = {}): ConfigInterface {
@@ -55,7 +33,7 @@ function configFrom(config: Partial<ConfigInterface> = {}): ConfigInterface {
             ...defaultConfig.intersectionObserver,
             ...config.intersectionObserver,
         },
-        svgDisallowed: [...(config.svgDisallowed ?? defaultConfig.svgDisallowed)],
+        sanitizer: config.sanitizer ?? defaultConfig.sanitizer,
     };
 }
 

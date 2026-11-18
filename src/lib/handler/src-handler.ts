@@ -18,6 +18,6 @@ export class SrcHandler extends AbstractHandler {
             return Promise.resolve(undefined);
         }
 
-        return loadIconText(resolveIconUrl(src, config.allowedOrigins), config.cacheTimeout);
+        return loadIconText(resolveIconUrl(src, config.allowedOrigins), config.cacheTimeout, config.sanitizer);
     }
 }

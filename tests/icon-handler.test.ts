@@ -41,18 +41,19 @@ class TestHandler implements HandlerInterface {
 }
 
 describe('ElementData config', () => {
-    it('copies the default denylist and observer options', () => {
+    it('copies observer options and keeps the default sanitizer', () => {
         const observer = { rootMargin: '10px' };
         const data = new ElementData('iconly-config', {
             intersectionObserver: observer,
+            sanitizer: 'basic',
         });
 
-        data.getConfig().svgDisallowed.push('path');
         observer.rootMargin = '99px';
 
         const fresh = new ElementData('iconly-config-fresh');
 
-        expect(fresh.getConfig().svgDisallowed).not.toContain('path');
+        expect(data.getConfig().sanitizer).toBe('basic');
+        expect(fresh.getConfig().sanitizer).toBe('strict');
         expect(data.getConfig().intersectionObserver.rootMargin).toBe('10px');
         expect(fresh.getConfig().intersectionObserver).not.toBe(data.getConfig().intersectionObserver);
     });

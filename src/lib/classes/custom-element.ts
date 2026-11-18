@@ -221,7 +221,7 @@ export class CustomElement extends elementBase() {
 
         void (async () => {
             if (url !== undefined) {
-                await dropIconRequest(url);
+                await dropIconRequest(url, config.sanitizer);
             }
 
             this.getIcon();
@@ -243,7 +243,7 @@ export class CustomElement extends elementBase() {
                     return;
                 }
 
-                const svg = sanitizeSvg(data, this.elementData.getConfig().svgDisallowed);
+                const svg = sanitizeSvg(data, this.elementData.getConfig().sanitizer);
 
                 if (svg === null) {
                     this.iconLoadedError(new Error('Unsafe SVG was blocked'));

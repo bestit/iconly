@@ -1,3 +1,9 @@
 # api-extractor and eslint still depend on minimatch 10, which is inside GHSA-g3hv-75wg-m249.
 overrides:
   minimatch: ^11.0.1
+
+# GitHub withdrew GHSA-fc5q-39xc-vjpf on 2026-11-18. npm's audit feed still reports it.
+# Remove this entry once `pnpm audit` is clean without it.
+audit:
+  ignore:
+    - GHSA-fc5q-39xc-vjpf

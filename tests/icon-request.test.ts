@@ -127,10 +127,40 @@ describe('loadIconText', () => {
 
         const text = await loadIconText(url, hour);
 
+        const stored = [...store.values()][0];
+
         expect(text).not.toContain('onclick');
         expect(text).toContain('<path');
-        expect(store.get(url)?.body).not.toContain('onclick');
-        expect(store.get(url)?.body).toContain('<path');
+        expect(stored?.body).not.toContain('onclick');
+        expect(stored?.body).toContain('<path');
+        expect([...store.keys()][0]).toContain('iconly-sanitizer=strict');
+    });
+
+    it('caches each sanitizer mode separately', async () => {
+        installCache();
+        const url = new URL('/icon.svg', window.location.href).href;
+        const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+            void input;
+            return new Response(
+                '<svg xmlns="http://www.w3.org/2000/svg"><style>.a{fill:red}</style><script>alert(1)</script><path d="M0 0"/></svg>',
+                {
+                    status: 200,
+                    headers: { 'content-type': 'image/svg+xml' },
+                },
+            );
+        });
+        vi.stubGlobal('fetch', fetchMock);
+
+        const strict = await loadIconText(url, hour, 'strict');
+        const basic = await loadIconText(url, hour, 'basic');
+
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+        expect(String(fetchMock.mock.calls[0]?.[0])).not.toContain('iconly-sanitizer');
+        expect(strict).not.toContain('<style');
+        expect(strict).not.toContain('<script');
+        expect(basic).toContain('<style');
+        expect(basic).not.toContain('<script');
+        expect(store.size).toBe(2);
     });
 
     it('rejects an svg larger than 1 MB', async () => {

@@ -48,9 +48,30 @@ describe('sanitizeSvg', () => {
         expect(path?.hasAttribute('stroke')).toBe(false);
     });
 
-    it('applies the extra denylist on top of the allowlist', () => {
-        const svg = sanitizeSvg(icon, ['path']);
+    it('drops style in strict mode and keeps presentational markup in basic mode', () => {
+        const source = [
+            '<svg xmlns="http://www.w3.org/2000/svg">',
+            '<style>.a{fill:red}</style>',
+            '<script>alert(1)</script>',
+            '<foreignObject><iframe src="https://evil.test"></iframe></foreignObject>',
+            '<a href="javascript:alert(1)"><path d="M0 0"/></a>',
+            '<path class="a" style="fill:red" onclick="alert(1)" d="M1 1"/>',
+            '</svg>',
+        ].join('');
+        const strict = sanitizeSvg(source);
+        const basic = sanitizeSvg(source, 'basic');
+        const off = sanitizeSvg(source, 'off');
 
-        expect(svg?.querySelector('path')).toBeNull();
+        expect(strict?.querySelector('style')).toBeNull();
+        expect(strict?.querySelector('path')?.hasAttribute('style')).toBe(false);
+        expect(basic?.querySelector('style')?.textContent).toContain('fill:red');
+        expect(basic?.querySelector('path[style]')?.getAttribute('style')).toBe('fill:red');
+        expect(basic?.querySelector('script')).toBeNull();
+        expect(basic?.querySelector('foreignObject')).toBeNull();
+        expect(basic?.querySelector('iframe')).toBeNull();
+        expect(basic?.querySelector('path')?.hasAttribute('onclick')).toBe(false);
+        expect(basic?.querySelector('a')?.hasAttribute('href')).toBe(false);
+        expect(off?.querySelector('script')).not.toBeNull();
+        expect(off?.querySelector('style')).not.toBeNull();
     });
 });

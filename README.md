@@ -140,7 +140,19 @@ Iconly.createElement('iconly', {
 });
 ```
 
-The SVG is parsed as XML and reduced to graphic elements and geometry attributes before it is inserted. Responses larger than 1 MB are rejected. Script, event handlers, `foreignObject`, `use`, links, and external URLs are removed. `svgDisallowed` is an extra denylist on top of that allowlist. An empty `svgDisallowed` list does not turn the allowlist off.
+The project also sets `sanitizer` in `createElement` or `setConfig`. Responses larger than 1 MB are rejected.
+
+`strict` is the default. The SVG is reduced to graphic elements and geometry attributes before it is inserted. `<style>`, the `style` attribute, script, event handlers, `foreignObject`, `use`, and links are removed.
+
+`basic` keeps `<style>`, `style` attributes, filters, and the other presentational SVG tags, so an existing icon file can keep its look. It still removes `script`, `foreignObject`, `iframe`, `object`, `embed`, event-handler attributes, and `javascript:` URLs. A `<style>` block is not scoped to the icon. Its selectors apply to the whole page.
+
+`off` parses the file as SVG and inlines that tree. A `script` element in the file will run. Use it only for trusted files that must look unchanged, then switch the same project to `strict` after those files are cleaned up.
+
+```ts
+Iconly.createElement('iconly', {
+    sanitizer: 'basic',
+});
+```
 
 ### Events
 

@@ -173,6 +173,27 @@ describe('custom element', () => {
         created.mockRestore();
     });
 
+    it('keeps a style element when the sanitizer is basic', async () => {
+        vi.stubGlobal('fetch', vi.fn(async () => svgResponse(
+            '<svg xmlns="http://www.w3.org/2000/svg"><style>.a{fill:red}</style><script>alert(1)</script><path class="a" d="M0 0"/></svg>',
+        )));
+        const tag = nextTag();
+
+        Iconly.createElement(tag, {
+            fetchPattern: '/icons/%SYMBOL%.svg',
+            createIntersectionObserver: false,
+            sanitizer: 'basic',
+        });
+        const element = document.createElement(tag);
+        element.setAttribute('symbol', 'cart');
+        document.body.append(element);
+        await flush();
+
+        expect(element.querySelector('style')).not.toBeNull();
+        expect(element.querySelector('script')).toBeNull();
+        expect(element.querySelector('path')).not.toBeNull();
+    });
+
     it('blocks an unsafe svg', async () => {
         vi.stubGlobal('fetch', vi.fn(async () => svgResponse('<svg></svg><img src="x" onerror="alert(1)">')));
         const tag = nextTag();

@@ -1,4 +1,4 @@
-import { sanitizeSvg } from './sanitize-svg.js';
+import { sanitizeSvg, type SanitizerMode } from './sanitize-svg.js';
 
 const CACHE_NAME = 'iconly';
 const SVG_MEDIA_TYPE = 'image/svg+xml';
@@ -16,6 +16,16 @@ interface StoredIcon {
 
 const memory = new Map<string, IconRequest>();
 
+function requestKey(url: string, mode: SanitizerMode): string {
+    return `${mode}\n${url}`;
+}
+
+function cacheUrl(url: string, mode: SanitizerMode): string {
+    const parsed = new URL(url, typeof location !== 'undefined' ? location.href : 'http://localhost/');
+    parsed.searchParams.set('iconly-sanitizer', mode);
+    return parsed.href;
+}
+
 function cacheAvailable(): boolean {
     return typeof window !== 'undefined' && 'caches' in window && window.isSecureContext;
 }
@@ -24,14 +34,16 @@ function mediaType(header: string | null): string {
     return header?.split(';')[0]?.trim().toLowerCase() ?? '';
 }
 
-async function readStoredIcon(url: string, cacheTimeout: number): Promise<StoredIcon | null> {
+async function readStoredIcon(url: string, cacheTimeout: number, mode: SanitizerMode): Promise<StoredIcon | null> {
     if (!cacheAvailable() || cacheTimeout <= 0) {
         return null;
     }
 
+    const storedUrl = cacheUrl(url, mode);
+
     try {
         const cache = await caches.open(CACHE_NAME);
-        const cached = await cache.match(url);
+        const cached = await cache.match(storedUrl);
 
         if (!cached) {
             return null;
@@ -40,7 +52,7 @@ async function readStoredIcon(url: string, cacheTimeout: number): Promise<Stored
         const timestamp = Number(cached.headers.get('X-Cache-Timestamp'));
 
         if (!Number.isFinite(timestamp) || Date.now() - timestamp >= cacheTimeout) {
-            await cache.delete(url);
+            await cache.delete(storedUrl);
             return null;
         }
 
@@ -54,14 +66,14 @@ async function readStoredIcon(url: string, cacheTimeout: number): Promise<Stored
     }
 }
 
-async function writeStoredIcon(url: string, text: string): Promise<void> {
+async function writeStoredIcon(url: string, text: string, mode: SanitizerMode): Promise<void> {
     if (!cacheAvailable()) {
         return;
     }
 
     try {
         const cache = await caches.open(CACHE_NAME);
-        await cache.put(url, new Response(text, {
+        await cache.put(cacheUrl(url, mode), new Response(text, {
             headers: {
                 'Content-Type': SVG_MEDIA_TYPE,
                 'X-Cache-Timestamp': Date.now().toString(),
@@ -73,14 +85,14 @@ async function writeStoredIcon(url: string, text: string): Promise<void> {
     }
 }
 
-async function deleteStoredIcon(url: string): Promise<void> {
+async function deleteStoredIcon(url: string, mode: SanitizerMode): Promise<void> {
     if (!cacheAvailable()) {
         return;
     }
 
     try {
         const cache = await caches.open(CACHE_NAME);
-        await cache.delete(url);
+        await cache.delete(cacheUrl(url, mode));
     }
     catch {
         // A failed delete still leaves the memory entry cleared by the caller.
@@ -141,8 +153,8 @@ async function readLimitedText(response: Response, url: string): Promise<string>
     return new TextDecoder().decode(body);
 }
 
-function sanitizedMarkup(text: string): string {
-    const svg = sanitizeSvg(text);
+function sanitizedMarkup(text: string, mode: SanitizerMode): string {
+    const svg = sanitizeSvg(text, mode);
 
     if (svg === null) {
         throw new Error('Unsafe SVG was blocked');
@@ -151,7 +163,7 @@ function sanitizedMarkup(text: string): string {
     return new XMLSerializer().serializeToString(svg);
 }
 
-async function fetchSvg(url: string): Promise<string> {
+async function fetchSvg(url: string, mode: SanitizerMode): Promise<string> {
     const response = await fetch(url, {
         cache: 'default',
         credentials: 'same-origin',
@@ -163,20 +175,21 @@ async function fetchSvg(url: string): Promise<string> {
         throw new Error(`Icon ${url} could not be loaded`);
     }
 
-    return sanitizedMarkup(await readLimitedText(response, url));
+    return sanitizedMarkup(await readLimitedText(response, url), mode);
 }
 
 export function clearIconRequestMemory(): void {
     memory.clear();
 }
 
-export async function dropIconRequest(url: string): Promise<void> {
-    memory.delete(url);
-    await deleteStoredIcon(url);
+export async function dropIconRequest(url: string, mode: SanitizerMode = 'strict'): Promise<void> {
+    memory.delete(requestKey(url, mode));
+    await deleteStoredIcon(url, mode);
 }
 
-export function loadIconText(url: string, cacheTimeout: number): Promise<string> {
-    const existing = memory.get(url);
+export function loadIconText(url: string, cacheTimeout: number, mode: SanitizerMode = 'strict'): Promise<string> {
+    const key = requestKey(url, mode);
+    const existing = memory.get(key);
     const fresh = existing !== undefined && (cacheTimeout <= 0 || Date.now() - existing.storedAt < cacheTimeout);
 
     if (existing !== undefined && fresh) {
@@ -190,32 +203,32 @@ export function loadIconText(url: string, cacheTimeout: number): Promise<string>
 
     request.promise = (async () => {
         if (cacheTimeout > 0) {
-            const stored = await readStoredIcon(url, cacheTimeout);
+            const stored = await readStoredIcon(url, cacheTimeout, mode);
 
-            if (stored !== null && memory.get(url)?.promise === request.promise) {
+            if (stored !== null && memory.get(key)?.promise === request.promise) {
                 request.storedAt = stored.storedAt;
                 return stored.text;
             }
         }
 
-        const text = await fetchSvg(url);
+        const text = await fetchSvg(url, mode);
 
-        if (memory.get(url)?.promise !== request.promise) {
+        if (memory.get(key)?.promise !== request.promise) {
             return text;
         }
 
         if (cacheTimeout > 0) {
-            await writeStoredIcon(url, text);
+            await writeStoredIcon(url, text, mode);
         }
 
         return text;
     })();
 
-    memory.set(url, request);
+    memory.set(key, request);
 
     void request.promise.catch(() => {
-        if (memory.get(url)?.promise === request.promise) {
-            memory.delete(url);
+        if (memory.get(key)?.promise === request.promise) {
+            memory.delete(key);
         }
     });
 
