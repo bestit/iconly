@@ -43,7 +43,7 @@ jobs:
             export NODE_AUTH_TOKEN="$NPM_TOKEN"
           fi
           if [[ "$VERSION" == *-* ]]; then
-            pnpm publish --access public --tag beta --provenance --no-git-checks
+            pnpm stage publish --access public --tag beta --provenance --no-git-checks
           else
-            pnpm publish --access public --provenance --no-git-checks
+            pnpm stage publish --access public --provenance --no-git-checks
           fi
