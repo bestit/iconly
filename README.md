@@ -142,7 +142,7 @@ Iconly.createElement('iconly', {
 
 The project also sets `sanitizer` in `createElement` or `setConfig`. Responses larger than 1 MB are rejected.
 
-`strict` is the default. The SVG is reduced to graphic elements and geometry attributes before it is inserted. `<style>`, the `style` attribute, script, event handlers, `foreignObject`, `use`, and links are removed.
+`strict` is the default. The SVG is reduced to graphic elements and geometry attributes before it is inserted. `<style>`, script, event handlers, `foreignObject`, `use`, and links are removed. A `style` attribute is kept, except when its value contains `javascript:` or a `url()` that points outside the icon.
 
 `basic` keeps `<style>`, `style` attributes, filters, and the other presentational SVG tags, so an existing icon file can keep its look. It still removes `script`, `foreignObject`, `iframe`, `object`, `embed`, event-handler attributes, and `javascript:` URLs. A `<style>` block is not scoped to the icon. Its selectors apply to the whole page.
 

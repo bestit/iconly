@@ -73,6 +73,7 @@ const ALLOWED_ATTRIBUTES = new Set([
     'color',
     'display',
     'visibility',
+    'style',
 ]);
 
 const BASIC_REMOVED_ELEMENTS = new Set([
@@ -92,7 +93,7 @@ function isStrictlyUnsafeAttribute(name: string, value: string): boolean {
         return true;
     }
 
-    if (normalized === 'style' || normalized === 'src' || normalized === 'href' || normalized.endsWith(':href')) {
+    if (normalized === 'src' || normalized === 'href' || normalized.endsWith(':href')) {
         return true;
     }
 

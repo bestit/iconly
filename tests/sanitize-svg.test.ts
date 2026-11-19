@@ -46,9 +46,13 @@ describe('sanitizeSvg', () => {
 
         expect(path?.getAttribute('fill')).toBe('url(#paint)');
         expect(path?.hasAttribute('stroke')).toBe(false);
+
+        const styled = sanitizeSvg('<svg xmlns="http://www.w3.org/2000/svg"><path style="fill:url(https://evil.test/a)" d="M0 0"/></svg>');
+
+        expect(styled?.querySelector('path')?.hasAttribute('style')).toBe(false);
     });
 
-    it('drops style in strict mode and keeps presentational markup in basic mode', () => {
+    it('keeps an inline style in strict mode and presentational markup in basic mode', () => {
         const source = [
             '<svg xmlns="http://www.w3.org/2000/svg">',
             '<style>.a{fill:red}</style>',
@@ -63,7 +67,8 @@ describe('sanitizeSvg', () => {
         const off = sanitizeSvg(source, 'off');
 
         expect(strict?.querySelector('style')).toBeNull();
-        expect(strict?.querySelector('path')?.hasAttribute('style')).toBe(false);
+        expect(strict?.querySelector('path')?.getAttribute('style')).toBe('fill:red');
+        expect(strict?.querySelector('path')?.hasAttribute('onclick')).toBe(false);
         expect(basic?.querySelector('style')?.textContent).toContain('fill:red');
         expect(basic?.querySelector('path[style]')?.getAttribute('style')).toBe('fill:red');
         expect(basic?.querySelector('script')).toBeNull();
